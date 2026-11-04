@@ -1,0 +1,25 @@
+{
+  "name": "infra",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:layer": "npm install --no-workspaces --prefix lambda/image-resize/layer/nodejs --os=linux --cpu=arm64 --libc=glibc",
+    "synth": "npm run build:layer && cdk synth",
+    "diff": "npm run build:layer && cdk diff",
+    "deploy": "npm run build:layer && cdk deploy",
+    "destroy": "cdk destroy",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.219.0",
+    "constructs": "^10.4.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.164",
+    "@types/node": "^24.0.0",
+    "aws-cdk": "^2.1030.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5",
+    "vitest": "^5.1.0"
+  }
+}
