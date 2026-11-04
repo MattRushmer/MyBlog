@@ -7,6 +7,7 @@ import { createId } from "@/core/ids";
 import { NotFoundError } from "@/core/errors";
 import type { EntityMap, EntityType } from "@/core/types";
 import { dataResponse, handleRouteError } from "./envelope";
+import { revalidatePublicPages } from "./revalidate-public";
 
 interface RouteContext {
   readonly params: Promise<{ id: string }>;
@@ -46,6 +47,7 @@ export function createListCreateHandlers<T extends EntityType, TInput>(config: L
 
       const store = await getContentStore();
       const saved = await store.put(config.type, entity);
+      revalidatePublicPages();
       return dataResponse(saved, 201);
     } catch (error) {
       return handleRouteError(error);
@@ -95,6 +97,7 @@ export function createItemHandlers<T extends EntityType, TPatch>(config: ItemCon
 
       const store = await getContentStore();
       const updated = await store.patch(config.type, id, changes);
+      revalidatePublicPages();
       return dataResponse(updated);
     } catch (error) {
       return handleRouteError(error);
@@ -113,6 +116,7 @@ export function createItemHandlers<T extends EntityType, TPatch>(config: ItemCon
         await config.onDelete(existing);
       }
       await store.delete(config.type, id);
+      revalidatePublicPages();
       return dataResponse({ deleted: true });
     } catch (error) {
       return handleRouteError(error);
@@ -133,6 +137,7 @@ export function createReorderHandler(type: EntityType) {
       const { orderedIds } = reorderSchema.parse(body);
       const store = await getContentStore();
       await store.reorder(type, orderedIds);
+      revalidatePublicPages();
       return dataResponse({ reordered: true });
     } catch (error) {
       return handleRouteError(error);
