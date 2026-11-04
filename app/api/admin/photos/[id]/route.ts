@@ -6,6 +6,7 @@ import { requireSession } from "@/server/auth/require-session";
 import { dataResponse, handleRouteError } from "@/server/http/envelope";
 import { withResolvedUrls } from "@/server/http/resolve-photo-urls";
 import { unlinkPhotoReferences } from "@/server/http/unlink-photo-references";
+import { revalidatePublicPages } from "@/server/http/revalidate-public";
 
 const photoPatchSchema = photoUpdateSchema.partial();
 
@@ -33,6 +34,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const changes = photoPatchSchema.parse(await request.json());
     const [store, fileStorage] = await Promise.all([getContentStore(), getFileStorage()]);
     const updated = await store.patch("photo", id, changes);
+    revalidatePublicPages();
     return dataResponse(withResolvedUrls(updated, fileStorage));
   } catch (error) {
     return handleRouteError(error);
@@ -51,6 +53,7 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
     await fileStorage.delete([photo.originalKey, ...photo.renditions.map((rendition) => rendition.key)]);
     await unlinkPhotoReferences(store, id);
     await store.delete("photo", id);
+    revalidatePublicPages();
 
     return dataResponse({ deleted: true });
   } catch (error) {

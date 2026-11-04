@@ -5,6 +5,7 @@ import { getContentStore, getFileStorage, getImageProcessor } from "@/adapters";
 import { requireSession } from "@/server/auth/require-session";
 import { dataResponse, errorResponse, handleRouteError } from "@/server/http/envelope";
 import { withResolvedUrls } from "@/server/http/resolve-photo-urls";
+import { revalidatePublicPages } from "@/server/http/revalidate-public";
 
 interface RouteContext {
   readonly params: Promise<{ photoId: string }>;
@@ -51,6 +52,9 @@ export async function POST(_request: NextRequest, context: RouteContext) {
       updated = await store.patch("photo", photoId, { status: "failed", error: result.error });
     }
 
+    if (updated.status === "ready") {
+      revalidatePublicPages();
+    }
     return dataResponse(withResolvedUrls(updated, fileStorage));
   } catch (error) {
     return handleRouteError(error);
