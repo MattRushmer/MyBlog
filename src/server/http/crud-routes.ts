@@ -59,6 +59,8 @@ interface ItemConfig<T extends EntityType, TPatch> {
   readonly type: T;
   readonly patchSchema: z.ZodType<TPatch>;
   readonly validatePatch?: (patch: TPatch) => void;
+  /** Adds server-computed fields (e.g. recomputed readingTimeMinutes) alongside the parsed patch. */
+  readonly transformPatch?: (patch: TPatch) => Partial<Omit<EntityMap[T], "id" | "createdAt">>;
   /** Runs after the entity is confirmed to exist, before the content-store delete. */
   readonly onDelete?: (entity: EntityMap[T]) => Promise<void>;
 }
@@ -86,8 +88,13 @@ export function createItemHandlers<T extends EntityType, TPatch>(config: ItemCon
       const patch = config.patchSchema.parse(body);
       config.validatePatch?.(patch);
 
+      const changes = {
+        ...(patch as Partial<Omit<EntityMap[T], "id" | "createdAt">>),
+        ...config.transformPatch?.(patch),
+      };
+
       const store = await getContentStore();
-      const updated = await store.patch(config.type, id, patch as Partial<Omit<EntityMap[T], "id" | "createdAt">>);
+      const updated = await store.patch(config.type, id, changes);
       return dataResponse(updated);
     } catch (error) {
       return handleRouteError(error);
