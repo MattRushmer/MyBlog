@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import type { PhotoKind } from "@/core/schemas/photo";
 import { PhotoGrid } from "./PhotoGrid";
 import { PhotoUploadZone } from "./PhotoUploadZone";
 import type { PhotoViewModel } from "./types";
@@ -12,10 +13,19 @@ interface CoverPhotoPickerProps {
   readonly onChange: (photoId: string | null) => void;
   readonly maxUploadBytes: number;
   readonly storyId?: string | null;
+  /** Kind recorded for a photo uploaded from this picker - 'story' for story covers, 'asset' for project/cert art. */
+  readonly uploadKind?: PhotoKind;
 }
 
-/** Pick an existing ready photo as a cover, or upload a new one inline. Used by the story editor. */
-export function CoverPhotoPicker({ initialPhotos, selectedId, onChange, maxUploadBytes, storyId }: CoverPhotoPickerProps) {
+/** Pick an existing ready photo as a single-value field, or upload a new one inline. */
+export function CoverPhotoPicker({
+  initialPhotos,
+  selectedId,
+  onChange,
+  maxUploadBytes,
+  storyId,
+  uploadKind = "story",
+}: CoverPhotoPickerProps) {
   const [photos, setPhotos] = useState<readonly PhotoViewModel[]>(initialPhotos.filter((photo) => photo.status === "ready"));
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
@@ -50,7 +60,7 @@ export function CoverPhotoPicker({ initialPhotos, selectedId, onChange, maxUploa
 
   return (
     <div className="flex flex-col gap-4 rounded-token border border-border bg-surface p-4">
-      <PhotoUploadZone kind="story" storyId={storyId} maxUploadBytes={maxUploadBytes} onUploaded={handleUploaded} />
+      <PhotoUploadZone kind={uploadKind} storyId={storyId} maxUploadBytes={maxUploadBytes} onUploaded={handleUploaded} />
       <PhotoGrid
         photos={photos}
         selectedId={selectedId}
