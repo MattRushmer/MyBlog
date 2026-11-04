@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Production build
+build/
+dist/
+
+# CDK
+cdk.out/
+infra/cdk.out/
+next-env.d.ts
+
+# Environment variables (keep example)
+.env
+.env.*
+!.env.example
+
+# Local content store (seeded data, uploads)
+/data/
+
+# Test reports / coverage
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.lighthouseci/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# TypeScript build info
+*.tsbuildinfo
