@@ -1,0 +1,7 @@
+{
+  "name": "image-resize-layer",
+  "private": true,
+  "dependencies": {
+    "sharp": "0.35.5"
+  }
+}

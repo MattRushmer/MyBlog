@@ -2,6 +2,9 @@
   "name": "matt-rushmer-site",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "infra"
+  ],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
@@ -11,7 +14,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "hash-password": "tsx scripts/hash-password.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "build:open-next": "open-next build",
+    "infra:synth": "npm run build:open-next && npm --prefix infra run synth",
+    "infra:diff": "npm run build:open-next && npm --prefix infra run diff"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.1161.0",
@@ -31,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@opennextjs/aws": "^4.1.15",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.19.2",
     "@types/react": "^19",
