@@ -46,7 +46,7 @@ export class LocalAuthAdapter implements AuthAdapter {
     return this.issueSession(input.username);
   }
 
-  async respondToMfaChallenge(): Promise<SignInResult> {
+  async respondToMfaChallenge(_input: { challengeToken: string; code: string }): Promise<SignInResult> {
     return { status: "failed", reason: "mfa_invalid" };
   }
 
