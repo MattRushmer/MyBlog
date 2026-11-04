@@ -14,8 +14,17 @@ interface Draftable {
   readonly status: "draft" | "published";
 }
 
+/**
+ * Only Story and Project use status: 'draft' | 'published'. Photo.status
+ * is a pipeline state (uploading/processing/ready/failed) that happens to
+ * share the field name - checking "status" in item alone would wrongly
+ * treat every photo as a draft (since "ready" !== "published") and filter
+ * all of them out of list() by default.
+ */
 function isDraftable(item: unknown): item is Draftable {
-  return typeof item === "object" && item !== null && "status" in item;
+  if (typeof item !== "object" || item === null || !("status" in item)) return false;
+  const status = (item as { status: unknown }).status;
+  return status === "draft" || status === "published";
 }
 
 function applyListOptions<T>(items: readonly T[], options: ListOptions | undefined): readonly T[] {

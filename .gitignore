@@ -36,7 +36,8 @@ blob-report/
 *.log
 npm-debug.log*
 
-# Editor / OS
+# Editor / OS / agent tooling
+.claude/
 .vscode/
 .idea/
 .DS_Store

@@ -39,6 +39,15 @@ export function runContentStoreContractTests(getStore: () => ContentStore | Prom
       expect(withDrafts.some((item) => item.id === draft.id)).toBe(true);
     });
 
+    it("list never filters out photos by default, even though Photo also has a status field", async () => {
+      const store = await getStore();
+      const photo = makePhoto({ status: "ready" });
+      await store.put("photo", photo);
+
+      const defaultList = await store.list("photo");
+      expect(defaultList.some((item) => item.id === photo.id)).toBe(true);
+    });
+
     it("list respects the limit option", async () => {
       const store = await getStore();
       const items = [makeStory(), makeStory(), makeStory()];
