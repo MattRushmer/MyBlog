@@ -7,10 +7,22 @@ import { baseEntitySchema } from "./common";
  * schema module never has to import the registry.
  */
 const iconKeyPattern = /^(brand|generic):[a-z0-9-]+$/;
+const ALLOWED_URL_PROTOCOLS = new Set(["http:", "https:", "mailto:"]);
+
+function hasAllowedProtocol(url: string): boolean {
+  try {
+    return ALLOWED_URL_PROTOCOLS.has(new URL(url).protocol);
+  } catch {
+    return false;
+  }
+}
 
 export const linkSchema = baseEntitySchema.extend({
   label: z.string().min(1).max(100),
-  url: z.string().url(),
+  url: z
+    .string()
+    .url()
+    .refine(hasAllowedProtocol, "url must use http, https, or mailto"),
   iconKey: z.string().regex(iconKeyPattern, "iconKey must look like 'brand:github' or 'generic:mail'"),
   description: z.string().max(300).nullable(),
   isVisible: z.boolean(),
