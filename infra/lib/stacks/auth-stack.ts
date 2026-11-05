@@ -35,12 +35,21 @@ export class AuthStack extends Stack {
       },
     });
 
+    // generateSecret: false is deliberate. This client is called exclusively
+    // server-side by one Lambda in one account (src/adapters/auth/aws) -
+    // never from a browser - so a client secret adds no real security
+    // boundary here, only a hard provisioning problem: Cognito generates
+    // the secret itself at deploy time, and there's no way to hand it to
+    // the server Lambda's environment without either a circular stack
+    // dependency or embedding the plaintext secret into the synthesized
+    // CloudFormation template (SecretValue.unsafeUnwrap()). The actual
+    // security boundary is Cognito's own username/password + required MFA.
     this.userPoolClient = this.userPool.addClient("AdminUserPoolClient", {
       authFlows: {
         userPassword: true,
         userSrp: false,
       },
-      generateSecret: true,
+      generateSecret: false,
       preventUserExistenceErrors: true,
     });
   }

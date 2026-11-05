@@ -2,7 +2,9 @@ import path from "node:path";
 import { Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
+import * as cognito from "aws-cdk-lib/aws-cognito";
 import type * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as eventSources from "aws-cdk-lib/aws-lambda-event-sources";
 import * as s3 from "aws-cdk-lib/aws-s3";
@@ -26,6 +28,9 @@ export interface SiteStackProps extends StackProps {
    */
   readonly photosBucketName: string;
   readonly isrTable: dynamodb.ITable;
+  readonly contentTable: dynamodb.ITable;
+  readonly userPool: cognito.IUserPool;
+  readonly userPoolClientId: string;
 }
 
 /**
@@ -66,6 +71,15 @@ export class SiteStack extends Stack {
       visibilityTimeout: Duration.seconds(30),
     });
 
+    // Imported by name (see SiteStackProps.photosBucketName) so this
+    // reference never becomes a CloudFormation cross-stack Ref back to
+    // DataStack. addToResourcePolicy() on an imported bucket is a no-op;
+    // CloudFront's own read access is granted from DataStack's resource
+    // policy instead (see data-stack.ts). Grants added to the server
+    // function's role below are unaffected by that limitation - a grant
+    // only needs to modify the *role's* policy, which lives in this stack.
+    const photosBucket = s3.Bucket.fromBucketName(this, "PhotosBucket", props.photosBucketName);
+
     const serverFunction = new lambda.Function(this, "ServerFunction", {
       functionName: `blog-server-${props.stage}`,
       code: lambda.Code.fromAsset(path.join(OPEN_NEXT_DIR, "server-functions/default")),
@@ -75,17 +89,59 @@ export class SiteStack extends Stack {
       memorySize: 1024,
       timeout: Duration.seconds(30),
       environment: {
+        // OpenNext's own cache/revalidation wiring.
         CACHE_BUCKET_NAME: staticAssetsBucket.bucketName,
         CACHE_BUCKET_KEY_PREFIX: "_cache",
         CACHE_BUCKET_REGION: this.region,
         REVALIDATION_QUEUE_URL: revalidationQueue.queueUrl,
         REVALIDATION_QUEUE_REGION: this.region,
         CACHE_DYNAMO_TABLE: props.isrTable.tableName,
+        // The app's own config module (src/config/schema.ts) - without
+        // these, loadConfig() throws ConfigError at cold start and every
+        // route 500s, because the deployed function would otherwise
+        // silently default to DEPLOY_TARGET=local with no local
+        // filesystem to fall back to. CDN_DOMAIN is deliberately absent:
+        // it would have to be this distribution's own domain name, but
+        // this function is the distribution's origin, so Lambda-depends-
+        // on-Distribution (via this env var) and Distribution-depends-on-
+        // Lambda (via the origin) is a genuine CloudFormation dependency
+        // cycle, not something CDK can route around. Set it as a manual
+        // post-deploy config update (or once a custom domain exists,
+        // source it from that instead) - tracked as a known gap, not
+        // fixed here, since this stack isn't being deployed yet.
+        // AWS_REGION is deliberately not set here - it's a Lambda-
+        // reserved variable the runtime populates automatically with the
+        // function's own region, and CDK rejects setting it manually.
+        DEPLOY_TARGET: "aws",
+        CONTENT_TABLE_NAME: props.contentTable.tableName,
+        ISR_TABLE_NAME: props.isrTable.tableName,
+        PHOTOS_BUCKET_NAME: props.photosBucketName,
+        COGNITO_USER_POOL_ID: props.userPool.userPoolId,
+        COGNITO_CLIENT_ID: props.userPoolClientId,
       },
     });
     staticAssetsBucket.grantReadWrite(serverFunction);
     props.isrTable.grantReadWriteData(serverFunction);
     revalidationQueue.grantSendMessages(serverFunction);
+    // Full read/write on the content table: the server handles every
+    // entity type's admin CRUD plus every public page's reads, unlike the
+    // image-resize Lambda which only ever touches photo items.
+    props.contentTable.grantReadWriteData(serverFunction);
+    // cognito-idp:InitiateAuth/RespondToAuthChallenge only - this function
+    // never manages users or pool configuration, it only runs the sign-in
+    // flow a logged-out visitor already initiated.
+    serverFunction.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["cognito-idp:InitiateAuth", "cognito-idp:RespondToAuthChallenge"],
+        resources: [props.userPool.userPoolArn],
+      }),
+    );
+    // Full read/write (not prefix-scoped like the resizer): the admin
+    // photo routes create/head/delete originals, and createUploadTicket's
+    // presigned URL is only valid if the role that signed it actually
+    // holds the permission the presigned request exercises.
+    photosBucket.grantReadWrite(serverFunction);
 
     const revalidationFunction = new lambda.Function(this, "RevalidationFunction", {
       functionName: `blog-revalidation-${props.stage}`,
@@ -104,12 +160,6 @@ export class SiteStack extends Stack {
       authType: lambda.FunctionUrlAuthType.AWS_IAM,
     });
     const serverOrigin = origins.FunctionUrlOrigin.withOriginAccessControl(serverFunctionUrl);
-
-    // Imported by name (see SiteStackProps.photosBucketName) so this
-    // reference never becomes a CloudFormation cross-stack Ref back to
-    // DataStack. addToResourcePolicy() on an imported bucket is a no-op;
-    // actual read access is granted from DataStack's own policy instead.
-    const photosBucket = s3.Bucket.fromBucketName(this, "PhotosBucket", props.photosBucketName);
 
     const distribution = new cloudfront.Distribution(this, "Distribution", {
       comment: `blog-${props.stage}`,
