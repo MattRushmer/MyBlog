@@ -121,8 +121,27 @@ export class DataStack extends Stack {
       },
     });
 
-    this.contentTable.grantReadWriteData(imageResizeFunction);
-    this.photosBucket.grantReadWrite(imageResizeFunction);
+    // Scoped to exactly what processRecord() does (src/adapters/content-store/aws
+    // GetCommand+PutCommand under patch(), only ever on photo items) rather
+    // than the full-table grantReadWriteData() this previously used.
+    // dynamodb:LeadingKeys restricts access to items whose partition key
+    // is "TYPE#PHOTO" - this function can never touch a story, project,
+    // certification, or link item.
+    imageResizeFunction.addToRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ["dynamodb:GetItem", "dynamodb:PutItem"],
+        resources: [this.contentTable.tableArn],
+        conditions: {
+          "ForAllValues:StringEquals": { "dynamodb:LeadingKeys": ["TYPE#PHOTO"] },
+        },
+      }),
+    );
+    // Scoped to exactly the two prefixes this function ever touches:
+    // reads the original, writes renditions. Never needs delete, and
+    // never needs access outside these two prefixes.
+    this.photosBucket.grantRead(imageResizeFunction, "originals/*");
+    this.photosBucket.grantWrite(imageResizeFunction, "photos/*");
 
     this.photosBucket.addEventNotification(
       s3.EventType.OBJECT_CREATED,
