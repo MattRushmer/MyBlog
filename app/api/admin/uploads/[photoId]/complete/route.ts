@@ -32,6 +32,18 @@ export async function POST(_request: NextRequest, context: RouteContext) {
       return errorResponse("upload_not_found", "Original upload was not found - it may not have completed", 400);
     }
 
+    // If a prior call already moved this photo past 'uploading' (ready,
+    // processing, or failed), calling process() again would be a no-op
+    // on AWS - the real work happens via the S3 event the original PUT
+    // already triggered, not via this call - but still returns 'pending'
+    // every time. Without this guard, a retried/double-submitted request
+    // would overwrite an already-'ready' photo's status back to
+    // 'processing' with no second S3 event ever coming to move it out
+    // again, stranding it there permanently.
+    if (photo.status !== "uploading") {
+      return dataResponse(withResolvedUrls(photo, fileStorage));
+    }
+
     const imageProcessor = await getImageProcessor();
     const result = await imageProcessor.process({ photoId, originalKey: photo.originalKey });
 
