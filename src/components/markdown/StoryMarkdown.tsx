@@ -1,6 +1,6 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { parsePhotoReference } from "@/core/markdown/photo-reference";
 import { Picture } from "@/components/ui/Picture";
 import type { Rendition } from "@/core/types";
@@ -13,6 +13,22 @@ export interface StoryPhotoViewModel {
   readonly renditions: readonly Rendition[];
   readonly blurDataUrl: string | null;
 }
+
+/**
+ * rehype-sanitize's default schema only allows http/https for img[src]
+ * (and a few other protocols for href), so our `photo:<id>` scheme was
+ * being stripped before the custom img component ever saw it - every
+ * inline photo silently rendered as a broken <img> with no src. Extending
+ * the schema to also allow the `photo` protocol on img[src] fixes this
+ * without loosening anything else the default schema already blocks.
+ */
+const sanitizeSchema = {
+  ...defaultSchema,
+  protocols: {
+    ...defaultSchema.protocols,
+    src: [...(defaultSchema.protocols?.src ?? []), "photo"],
+  },
+};
 
 interface StoryMarkdownProps {
   readonly markdown: string;
@@ -67,7 +83,11 @@ export function StoryMarkdown({ markdown, photos, resolveUrl, className }: Story
 
   return (
     <div className={className}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]} components={components}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+        components={components}
+      >
         {markdown}
       </ReactMarkdown>
     </div>
