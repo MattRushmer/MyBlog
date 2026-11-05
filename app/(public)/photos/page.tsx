@@ -41,12 +41,12 @@ export default async function PhotosPage() {
     .map((photo) => toGalleryPhoto(photo, fileStorage));
 
   return (
-    <main id="main-content" className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="font-serif text-4xl text-foreground">Photos</h1>
+    <main id="main-content" className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+      <h1 className="font-serif text-3xl leading-tight text-foreground sm:text-4xl">Photos</h1>
       {galleryPhotos.length === 0 ? (
         <p className="mt-6 text-muted">No photos yet.</p>
       ) : (
-        <div className="mt-10">
+        <div className="mt-8 sm:mt-10">
           <PhotoGallery photos={galleryPhotos} />
         </div>
       )}

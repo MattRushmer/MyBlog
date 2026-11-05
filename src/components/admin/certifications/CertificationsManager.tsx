@@ -81,21 +81,21 @@ export function CertificationsManager({ initialCertifications, initialPhotos, ma
               onDragStart={() => handleDragStart(certification.id)}
               onDragOver={(event) => handleDragOver(event, certification.id)}
               onDragEnd={handleDragEnd}
-              className={`flex items-center justify-between rounded-token border bg-surface p-4 ${
+              className={`flex flex-col gap-3 rounded-token border bg-surface p-4 sm:flex-row sm:items-center sm:justify-between ${
                 draggedId === certification.id ? "opacity-50" : "border-border"
               }`}
             >
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="cursor-grab text-muted" aria-hidden>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex min-h-11 min-w-11 cursor-grab items-center justify-center text-muted" aria-hidden>
                     ::
                   </span>
                   <span className="font-medium text-foreground">{certification.name}</span>
                   <Badge tone={certification.state === "earned" ? "accent" : "neutral"}>{certification.state}</Badge>
                 </div>
-                <p className="text-sm text-muted">{certification.issuer}</p>
+                <p className="mt-1 text-sm text-muted">{certification.issuer}</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button type="button" variant="secondary" onClick={() => setEditingId(certification.id)}>
                   Edit
                 </Button>

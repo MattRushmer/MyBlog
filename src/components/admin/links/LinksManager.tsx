@@ -60,24 +60,24 @@ export function LinksManager({ initialLinks }: LinksManagerProps) {
               onDragStart={() => handleDragStart(link.id)}
               onDragOver={(event) => handleDragOver(event, link.id)}
               onDragEnd={handleDragEnd}
-              className={`flex items-center justify-between rounded-token border bg-surface p-4 ${
+              className={`flex flex-col gap-3 rounded-token border bg-surface p-4 sm:flex-row sm:items-center sm:justify-between ${
                 draggedId === link.id ? "opacity-50" : "border-border"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <span className="cursor-grab text-muted" aria-hidden>
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="inline-flex min-h-11 min-w-11 flex-none cursor-grab items-center justify-center text-muted" aria-hidden>
                   ::
                 </span>
-                <Icon iconKey={link.iconKey} className="h-5 w-5 text-foreground" aria-hidden={false} />
-                <div>
-                  <div className="flex items-center gap-2">
+                <Icon iconKey={link.iconKey} className="h-5 w-5 flex-none text-foreground" aria-hidden />
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-foreground">{link.label}</span>
                     {!link.isVisible && <Badge>Hidden</Badge>}
                   </div>
-                  <p className="text-sm text-muted">{link.url}</p>
+                  <p className="mt-1 truncate text-sm text-muted">{link.url}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button type="button" variant="secondary" onClick={() => setEditingId(link.id)}>
                   Edit
                 </Button>

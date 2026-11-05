@@ -50,7 +50,7 @@ export function PhotoManager({ initialPhotos, maxUploadBytes }: PhotoManagerProp
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <label className="text-sm text-foreground" htmlFor="upload-kind">
           Upload as
         </label>
@@ -58,7 +58,7 @@ export function PhotoManager({ initialPhotos, maxUploadBytes }: PhotoManagerProp
           id="upload-kind"
           value={uploadKind}
           onChange={(event) => setUploadKind(event.target.value as PhotoKind)}
-          className="rounded-token border border-border bg-background px-2 py-1 text-sm text-foreground"
+          className="min-h-11 rounded-token border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
         >
           <option value="gallery">Gallery</option>
           <option value="story">Story</option>
@@ -68,13 +68,14 @@ export function PhotoManager({ initialPhotos, maxUploadBytes }: PhotoManagerProp
 
       <PhotoUploadZone kind={uploadKind} maxUploadBytes={maxUploadBytes} onUploaded={handleUploaded} />
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter photos by kind">
         {KIND_FILTERS.map((filter) => (
           <button
             key={filter.value}
             type="button"
             onClick={() => setKindFilter(filter.value)}
-            className={`rounded-token px-3 py-1 text-sm ${
+            aria-pressed={kindFilter === filter.value}
+            className={`inline-flex min-h-11 items-center rounded-token px-3 text-sm transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] ${
               kindFilter === filter.value ? "bg-accent text-accent-foreground" : "border border-border text-foreground"
             }`}
           >

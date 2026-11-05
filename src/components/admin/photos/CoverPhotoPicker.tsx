@@ -39,7 +39,7 @@ export function CoverPhotoPicker({
 
   if (!isPickerOpen) {
     return (
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         {selectedPhoto ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={selectedPhoto.originalUrl} alt={selectedPhoto.altText} className="h-16 w-16 rounded-token object-cover" />

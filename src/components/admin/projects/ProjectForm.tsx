@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { slugify } from "@/core/slug";
 import type { Project } from "@/core/schemas/project";
 import { Button } from "@/components/ui/Button";
-import { Field, TextArea, TextInput, CheckboxField } from "@/components/admin/form-controls";
+import { Field, TextArea, TextInput, CheckboxField, Select } from "@/components/admin/form-controls";
 import { CoverPhotoPicker } from "@/components/admin/photos/CoverPhotoPicker";
 import type { PhotoViewModel } from "@/components/admin/photos/types";
 
@@ -126,16 +126,12 @@ export function ProjectForm({ initialProject, initialPhotos, maxUploadBytes, nex
         />
       </Field>
 
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
         <Field label="Status">
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value as Project["status"])}
-            className="rounded-token border border-border bg-background px-3 py-2 text-sm text-foreground"
-          >
+          <Select value={status} onChange={(event) => setStatus(event.target.value as Project["status"])}>
             <option value="draft">Draft</option>
             <option value="published">Published</option>
-          </select>
+          </Select>
         </Field>
         <CheckboxField label="Featured" checked={isFeatured} onChange={setIsFeatured} />
       </div>

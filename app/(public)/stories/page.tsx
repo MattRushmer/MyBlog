@@ -22,12 +22,12 @@ export default async function StoriesPage() {
   const photoById = await loadPhotosByIds(store, sortedStories.map((story) => story.coverPhotoId));
 
   return (
-    <main id="main-content" className="mx-auto max-w-4xl px-6 py-16">
-      <h1 className="font-serif text-4xl text-foreground">Stories</h1>
+    <main id="main-content" className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+      <h1 className="font-serif text-3xl leading-tight text-foreground sm:text-4xl">Stories</h1>
       {sortedStories.length === 0 ? (
         <p className="mt-6 text-muted">No stories published yet.</p>
       ) : (
-        <div className="mt-10 grid gap-8">
+        <div className="mt-8 grid gap-6 sm:mt-10 sm:gap-8">
           {sortedStories.map((story) => (
             <StoryCard
               key={story.id}

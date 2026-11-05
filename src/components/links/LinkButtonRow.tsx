@@ -11,7 +11,7 @@ export function LinkButtonRow({ link }: { readonly link: LinkEntity }) {
     <LinkButton
       href={link.url}
       variant="secondary"
-      className="w-full justify-start gap-3 py-3 text-base"
+      className="w-full justify-start gap-3 py-3 text-left text-base"
       {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
     >
       <Icon iconKey={link.iconKey} className="h-5 w-5 text-accent" />

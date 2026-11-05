@@ -55,10 +55,10 @@ export default async function StoryDetailPage({ params }: { params: Promise<Stor
     : null;
 
   return (
-    <main id="main-content" className="mx-auto max-w-3xl px-6 py-16">
+    <main id="main-content" className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
       <article>
         <header>
-          <h1 className="font-serif text-4xl text-foreground">{story.title}</h1>
+          <h1 className="font-serif text-3xl leading-tight text-foreground sm:text-4xl">{story.title}</h1>
           <div className="mt-4">
             <StoryMeta
               tags={story.tags}
@@ -70,7 +70,7 @@ export default async function StoryDetailPage({ params }: { params: Promise<Stor
 
         {coverPhoto && (
           <Picture
-            className="mt-8"
+            className="mt-8 overflow-hidden rounded-token"
             renditions={coverPhoto.renditions}
             width={coverPhoto.width}
             height={coverPhoto.height}
@@ -83,7 +83,7 @@ export default async function StoryDetailPage({ params }: { params: Promise<Stor
         )}
 
         <StoryMarkdown
-          className="story-body mt-10 font-serif"
+          className="story-body mt-8 font-serif sm:mt-10"
           markdown={story.bodyMarkdown}
           photos={photoMap}
           resolveUrl={fileStorage.publicUrl}

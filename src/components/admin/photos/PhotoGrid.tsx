@@ -20,7 +20,7 @@ export function PhotoGrid({ photos, selectedId, onSelect, editable = false, onCa
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4">
       {photos.map((photo) => {
         const thumbnailUrl = pickThumbnailUrl(photo);
         const isSelected = selectedId === photo.id;
@@ -33,7 +33,9 @@ export function PhotoGrid({ photos, selectedId, onSelect, editable = false, onCa
             <button
               type="button"
               onClick={() => onSelect?.(photo)}
-              className="relative flex aspect-square items-center justify-center overflow-hidden rounded-token bg-background"
+              aria-pressed={onSelect ? isSelected : undefined}
+              aria-label={onSelect ? `Select photo: ${photo.altText}` : undefined}
+              className="relative flex aspect-square min-h-11 items-center justify-center overflow-hidden rounded-token bg-background"
             >
               {thumbnailUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -43,7 +45,7 @@ export function PhotoGrid({ photos, selectedId, onSelect, editable = false, onCa
               )}
             </button>
 
-            <div className="flex items-center justify-between gap-1">
+            <div className="flex flex-wrap items-center justify-between gap-1">
               <Badge tone={photo.status === "ready" ? "accent" : "neutral"}>{photo.status}</Badge>
               <Badge>{photo.kind}</Badge>
             </div>
@@ -53,14 +55,16 @@ export function PhotoGrid({ photos, selectedId, onSelect, editable = false, onCa
                 <input
                   defaultValue={photo.altText}
                   placeholder="Alt text"
+                  aria-label={`Alt text for ${photo.altText || "photo"}`}
                   onBlur={(event) => onCaptionChange?.(photo, { altText: event.target.value })}
-                  className="rounded-token border border-border bg-background px-2 py-1 text-xs text-foreground"
+                  className="min-h-11 rounded-token border border-border bg-background px-2 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                 />
                 <input
                   defaultValue={photo.caption ?? ""}
                   placeholder="Caption"
+                  aria-label={`Caption for ${photo.altText || "photo"}`}
                   onBlur={(event) => onCaptionChange?.(photo, { caption: event.target.value || null })}
-                  className="rounded-token border border-border bg-background px-2 py-1 text-xs text-foreground"
+                  className="min-h-11 rounded-token border border-border bg-background px-2 py-2 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
                 />
                 <DeleteEntityButton
                   endpoint={`/api/admin/photos/${photo.id}`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type DragEvent } from "react";
+import { useState, type DragEvent } from "react";
 import type { PhotoKind } from "@/core/schemas/photo";
 import type { PhotoViewModel } from "./types";
 
@@ -85,7 +85,6 @@ async function uploadOneFile(
 export function PhotoUploadZone({ kind, storyId, maxUploadBytes, onUploaded }: PhotoUploadZoneProps) {
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState<readonly UploadingFile[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   function updateFileStatus(key: string, status: UploadingFile["status"], message?: string) {
     setUploadingFiles((current) => current.map((item) => (item.key === key ? { ...item, status, message } : item)));
@@ -119,7 +118,7 @@ export function PhotoUploadZone({ kind, storyId, maxUploadBytes, onUploaded }: P
     );
   }
 
-  function handleDrop(event: DragEvent<HTMLDivElement>) {
+  function handleDrop(event: DragEvent<HTMLLabelElement>) {
     event.preventDefault();
     setIsDraggingOver(false);
     void handleFiles(event.dataTransfer.files);
@@ -127,32 +126,32 @@ export function PhotoUploadZone({ kind, storyId, maxUploadBytes, onUploaded }: P
 
   return (
     <div>
-      <div
+      <label
         onDragOver={(event) => {
           event.preventDefault();
           setIsDraggingOver(true);
         }}
         onDragLeave={() => setIsDraggingOver(false)}
         onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
-        className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-token border-2 border-dashed p-8 text-center transition-colors ${
+        className={`flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-token border-2 border-dashed p-8 text-center transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] ${
           isDraggingOver ? "border-accent bg-accent/5" : "border-border bg-surface"
         }`}
       >
-        <p className="text-sm font-medium text-foreground">Drop photos here or click to browse</p>
-        <p className="text-xs text-muted">JPEG, PNG, or WebP - up to {Math.round(maxUploadBytes / (1024 * 1024))}MB each</p>
+        <span className="text-sm font-medium text-foreground">Drop photos here or click to browse</span>
+        <span className="text-xs text-muted">
+          JPEG, PNG, or WebP - up to {Math.round(maxUploadBytes / (1024 * 1024))}MB each
+        </span>
         <input
-          ref={inputRef}
           type="file"
           accept="image/*"
           multiple
-          className="hidden"
+          className="sr-only"
           onChange={(event) => {
             void handleFiles(event.target.files);
             event.target.value = "";
           }}
         />
-      </div>
+      </label>
 
       {uploadingFiles.length > 0 && (
         <ul className="mt-3 flex flex-col gap-1">

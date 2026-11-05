@@ -12,7 +12,7 @@ export default async function StoriesAdminPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-semibold text-foreground">Stories</h1>
         <LinkButton href="/admin/stories/new">New story</LinkButton>
       </div>
@@ -20,16 +20,19 @@ export default async function StoriesAdminPage() {
       <div className="flex flex-col gap-3">
         {sorted.length === 0 && <p className="text-muted">No stories yet.</p>}
         {sorted.map((story) => (
-          <div key={story.id} className="flex items-center justify-between rounded-token border border-border bg-surface p-4">
-            <div>
-              <div className="flex items-center gap-2">
+          <div
+            key={story.id}
+            className="flex flex-col gap-3 rounded-token border border-border bg-surface p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium text-foreground">{story.title}</span>
                 <Badge tone={story.status === "published" ? "accent" : "neutral"}>{story.status}</Badge>
                 {story.isFeatured && <Badge tone="accent">Featured</Badge>}
               </div>
-              <p className="text-sm text-muted">/{story.slug}</p>
+              <p className="mt-1 truncate text-sm text-muted">/{story.slug}</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <LinkButton variant="secondary" href={`/admin/stories/${story.id}`}>
                 Edit
               </LinkButton>

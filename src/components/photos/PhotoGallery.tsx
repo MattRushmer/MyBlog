@@ -24,13 +24,13 @@ export function PhotoGallery({ photos }: { readonly photos: readonly GalleryPhot
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {photos.map((photo, index) => (
           <button
             key={photo.id}
             type="button"
             onClick={() => setOpenIndex(index)}
-            className="overflow-hidden rounded-token transition-opacity duration-150 hover:opacity-90"
+            className="aspect-square min-h-11 overflow-hidden rounded-token transition-opacity duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:opacity-90"
             aria-label={`Open photo: ${photo.alt}`}
           >
             <Picture
@@ -41,7 +41,7 @@ export function PhotoGallery({ photos }: { readonly photos: readonly GalleryPhot
               blurDataUrl={photo.blurDataUrl}
               resolveUrl={RESOLVED_URL}
               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-              className="h-full object-cover"
+              className="block h-full [&_img]:h-full [&_img]:object-cover"
             />
           </button>
         ))}

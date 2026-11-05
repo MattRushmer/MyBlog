@@ -33,21 +33,27 @@ export default async function AuthenticatedAdminLayout({ children }: { children:
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <nav className="flex items-center gap-4">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between">
+          <nav aria-label="Admin navigation" className="flex flex-wrap items-center gap-x-1 gap-y-1">
             {NAV_LINKS.map((link) => (
-              <Link key={link.href} href={link.href} className="text-sm font-medium text-foreground hover:text-accent">
+              <Link
+                key={link.href}
+                href={link.href}
+                className="inline-flex min-h-11 items-center px-2 text-sm font-medium text-foreground transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:text-accent"
+              >
                 {link.label}
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex min-h-11 flex-wrap items-center gap-3">
             <span className="text-sm text-muted">{username}</span>
             <SignOutButton />
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-6 py-8">{children}</main>
+      <main id="main-content" className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        {children}
+      </main>
     </div>
   );
 }
