@@ -17,12 +17,12 @@ export default async function CertificationsPage() {
   const photoById = await loadPhotosByIds(store, sorted.map((certification) => certification.badgePhotoId));
 
   return (
-    <main id="main-content" className="mx-auto max-w-4xl px-6 py-16">
-      <h1 className="font-serif text-4xl text-foreground">Certifications</h1>
+    <main id="main-content" className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+      <h1 className="font-serif text-3xl leading-tight text-foreground sm:text-4xl">Certifications</h1>
       {sorted.length === 0 ? (
         <p className="mt-6 text-muted">No certifications listed yet.</p>
       ) : (
-        <div className="mt-10 grid gap-6">
+        <div className="mt-8 grid gap-6 sm:mt-10">
           {sorted.map((certification) => (
             <CertificationCard
               key={certification.id}

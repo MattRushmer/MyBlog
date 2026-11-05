@@ -24,9 +24,9 @@ export function ProjectCard({ project, screenshot, resolveUrl }: ProjectCardProp
           sizes="(min-width: 768px) 500px, 100vw"
         />
       )}
-      <div className="flex flex-1 flex-col p-6">
-        <h3 className="font-serif text-xl text-foreground">{project.title}</h3>
-        <p className="mt-2 flex-1 text-muted">{project.description}</p>
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <h3 className="font-serif text-xl leading-snug text-foreground">{project.title}</h3>
+        <p className="mt-2 flex-1 text-base leading-relaxed text-muted">{project.description}</p>
         {project.techTags.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {project.techTags.map((tag) => (

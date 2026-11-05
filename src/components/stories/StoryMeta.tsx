@@ -10,9 +10,13 @@ interface StoryMetaProps {
 /** The tags / reading time / published date row shared by story cards and the story detail page. */
 export function StoryMeta({ tags, readingTimeMinutes, publishedAt }: StoryMetaProps) {
   return (
-    <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
-      {publishedAt && <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>}
-      <span aria-hidden="true">&middot;</span>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
+      {publishedAt && (
+        <>
+          <time dateTime={publishedAt}>{formatDate(publishedAt)}</time>
+          <span aria-hidden="true">&middot;</span>
+        </>
+      )}
       <span>{readingTimeMinutes} min read</span>
       {tags.length > 0 && (
         <span className="flex flex-wrap gap-2">

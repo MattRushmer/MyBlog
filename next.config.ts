@@ -3,16 +3,26 @@ import type { NextConfig } from "next";
 const isProduction = process.env.NODE_ENV === "production";
 
 /**
- * script-src stays strict in production (no inline/eval needed - Next.js
- * ships all its own JS as external same-origin bundles). 'unsafe-eval' is
- * only added outside production because Next's dev-mode Fast Refresh
- * overlay relies on it; it never ships to a built app. style-src needs
- * 'unsafe-inline' because Picture.tsx sets a blur-placeholder background
- * via an inline style attribute, not a stylesheet class.
+ * script-src needs 'unsafe-inline': the App Router hydrates by streaming
+ * RSC payloads through inline `<script>self.__next_f.push(...)</script>`
+ * tags in the initial HTML, not just external bundles - verified directly
+ * (a prior stricter CSP here silently broke hydration on every page,
+ * leaving the DOM blank despite a 200 response). Next's documented fix is
+ * a per-request nonce generated in middleware, but that requires every
+ * page using it to opt out of static generation (nonces must be unique
+ * per request), which would undermine this project's static-generation /
+ * cost-minimization architecture (most public pages are prerendered at
+ * build time). 'unsafe-inline' is the deliberate tradeoff for a site with
+ * no user-generated script content and already-sanitized Markdown;
+ * frame-ancestors/object-src/base-uri still block the higher-value attack
+ * classes (clickjacking, plugin injection, base-tag hijacking). 'unsafe-
+ * eval' is added only outside production, for Next's dev-mode Fast
+ * Refresh overlay. style-src needs 'unsafe-inline' because Picture.tsx
+ * sets a blur-placeholder background via an inline style attribute.
  */
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self'${isProduction ? "" : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline'${isProduction ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data:",
   "font-src 'self'",

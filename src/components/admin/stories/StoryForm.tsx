@@ -6,7 +6,7 @@ import type { Story } from "@/core/schemas/story";
 import { slugify } from "@/core/slug";
 import { StoryMarkdown, type StoryPhotoViewModel } from "@/components/markdown/StoryMarkdown";
 import { Button } from "@/components/ui/Button";
-import { Field, TextArea, TextInput, CheckboxField } from "@/components/admin/form-controls";
+import { Field, TextArea, TextInput, CheckboxField, Select } from "@/components/admin/form-controls";
 import { CoverPhotoPicker } from "@/components/admin/photos/CoverPhotoPicker";
 import type { PhotoViewModel } from "@/components/admin/photos/types";
 
@@ -160,22 +160,23 @@ export function StoryForm({ mode, initialStory, initialPhotos, maxUploadBytes }:
           />
         </Field>
         <Field label="Preview">
-          <div className="h-full overflow-y-auto rounded-token border border-border bg-surface p-4">
-            <StoryMarkdown markdown={debouncedMarkdown} photos={photoPreviewMap} resolveUrl={resolveUrl} />
+          <div className="min-h-64 overflow-y-auto rounded-token border border-border bg-surface p-4 lg:min-h-full">
+            <StoryMarkdown
+              className="story-body font-serif"
+              markdown={debouncedMarkdown}
+              photos={photoPreviewMap}
+              resolveUrl={resolveUrl}
+            />
           </div>
         </Field>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:gap-6">
         <Field label="Status">
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value as Story["status"])}
-            className="rounded-token border border-border bg-background px-3 py-2 text-sm text-foreground"
-          >
+          <Select value={status} onChange={(event) => setStatus(event.target.value as Story["status"])}>
             <option value="draft">Draft</option>
             <option value="published">Published</option>
-          </select>
+          </Select>
         </Field>
         <CheckboxField label="Featured" checked={isFeatured} onChange={setIsFeatured} />
       </div>

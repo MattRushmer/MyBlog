@@ -17,12 +17,12 @@ export default async function ProjectsPage() {
   const photoById = await loadPhotosByIds(store, sorted.map((project) => project.screenshotPhotoId));
 
   return (
-    <main id="main-content" className="mx-auto max-w-4xl px-6 py-16">
-      <h1 className="font-serif text-4xl text-foreground">Projects</h1>
+    <main id="main-content" className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+      <h1 className="font-serif text-3xl leading-tight text-foreground sm:text-4xl">Projects</h1>
       {sorted.length === 0 ? (
         <p className="mt-6 text-muted">No projects published yet.</p>
       ) : (
-        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+        <div className="mt-8 grid gap-6 sm:mt-10 sm:grid-cols-2">
           {sorted.map((project) => (
             <ProjectCard
               key={project.id}

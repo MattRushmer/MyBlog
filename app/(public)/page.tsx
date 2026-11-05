@@ -34,10 +34,10 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main id="main-content" className="mx-auto max-w-4xl px-6 py-16">
+    <main id="main-content" className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
       <section>
-        <h1 className="font-serif text-4xl text-foreground">{OWNER_NAME}</h1>
-        <p className="mt-4 max-w-2xl text-lg text-muted">
+        <h1 className="font-serif text-3xl leading-tight text-foreground sm:text-4xl">{OWNER_NAME}</h1>
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
           I work on security and cloud solutions - hardening infrastructure, building on AWS, and
           writing up what I learn along the way. This site collects my stories, projects, and a
           few photos.
@@ -45,14 +45,17 @@ export default async function HomePage() {
       </section>
 
       {recentStories.length > 0 && (
-        <section className="mt-16">
-          <div className="flex items-baseline justify-between">
+        <section className="mt-14 sm:mt-16">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <h2 className="font-serif text-2xl text-foreground">Latest stories</h2>
-            <Link href="/stories" className="text-sm text-accent hover:text-accent-hover">
+            <Link
+              href="/stories"
+              className="inline-flex min-h-11 items-center text-sm text-accent transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:text-accent-hover"
+            >
               All stories
             </Link>
           </div>
-          <div className="mt-6 grid gap-6">
+          <div className="mt-6 grid gap-6 sm:gap-8">
             {recentStories.map((story) => (
               <StoryCard
                 key={story.id}
@@ -66,10 +69,13 @@ export default async function HomePage() {
       )}
 
       {spotlightProjects.length > 0 && (
-        <section className="mt-16">
-          <div className="flex items-baseline justify-between">
+        <section className="mt-14 sm:mt-16">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <h2 className="font-serif text-2xl text-foreground">Featured projects</h2>
-            <Link href="/projects" className="text-sm text-accent hover:text-accent-hover">
+            <Link
+              href="/projects"
+              className="inline-flex min-h-11 items-center text-sm text-accent transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:text-accent-hover"
+            >
               All projects
             </Link>
           </div>

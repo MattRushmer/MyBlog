@@ -81,22 +81,22 @@ export function ProjectsManager({ initialProjects, initialPhotos, maxUploadBytes
               onDragStart={() => handleDragStart(project.id)}
               onDragOver={(event) => handleDragOver(event, project.id)}
               onDragEnd={handleDragEnd}
-              className={`flex items-center justify-between rounded-token border bg-surface p-4 ${
+              className={`flex flex-col gap-3 rounded-token border bg-surface p-4 sm:flex-row sm:items-center sm:justify-between ${
                 draggedId === project.id ? "opacity-50" : "border-border"
               }`}
             >
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="cursor-grab text-muted" aria-hidden>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex min-h-11 min-w-11 cursor-grab items-center justify-center text-muted" aria-hidden>
                     ::
                   </span>
                   <span className="font-medium text-foreground">{project.title}</span>
                   <Badge tone={project.status === "published" ? "accent" : "neutral"}>{project.status}</Badge>
                   {project.isFeatured && <Badge tone="accent">Featured</Badge>}
                 </div>
-                <p className="text-sm text-muted">/{project.slug}</p>
+                <p className="mt-1 truncate text-sm text-muted">/{project.slug}</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button type="button" variant="secondary" onClick={() => setEditingId(project.id)}>
                   Edit
                 </Button>

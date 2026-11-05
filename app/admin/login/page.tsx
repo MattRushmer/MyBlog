@@ -85,9 +85,9 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main id="main-content" className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <Card className="w-full max-w-sm">
-        <h1 className="mb-6 text-xl font-semibold text-foreground">Admin sign in</h1>
+        <h1 className="mb-6 text-2xl font-semibold text-foreground">Admin sign in</h1>
 
         {!challengeToken ? (
           <form onSubmit={handleLogin} className="flex flex-col gap-4">

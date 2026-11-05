@@ -9,8 +9,9 @@ const VARIANT_CLASSES: Record<Variant, string> = {
 };
 
 const BASE_CLASSES =
-  "inline-flex items-center justify-center gap-2 rounded-token px-4 py-2 text-sm font-medium " +
-  "transition-colors duration-150 disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-token px-4 py-2 text-sm font-medium " +
+  "transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] " +
+  "disabled:opacity-50 disabled:pointer-events-none";
 
 interface ButtonOwnProps {
   readonly variant?: Variant;

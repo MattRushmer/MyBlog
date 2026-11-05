@@ -84,7 +84,7 @@ export function Lightbox({ photos, index, onClose, onNavigate }: LightboxProps) 
         role="dialog"
         aria-modal="true"
         aria-label={photo.alt}
-        className="relative flex max-h-full max-w-5xl flex-col items-center"
+        className="relative flex max-h-full w-full max-w-5xl flex-col items-center"
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -92,7 +92,7 @@ export function Lightbox({ photos, index, onClose, onNavigate }: LightboxProps) 
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute -top-10 right-0 rounded-token px-3 py-1 text-sm text-background underline-offset-4 transition-opacity duration-150 hover:underline hover:opacity-80 sm:top-0 sm:-right-12"
+          className="absolute right-0 top-0 z-10 inline-flex min-h-11 min-w-11 items-center justify-center rounded-token text-sm text-background underline-offset-4 transition-opacity duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:underline hover:opacity-80 sm:-right-2 sm:-top-12"
         >
           Close
         </button>
@@ -103,7 +103,7 @@ export function Lightbox({ photos, index, onClose, onNavigate }: LightboxProps) 
               type="button"
               onClick={() => onNavigate((index - 1 + photos.length) % photos.length)}
               aria-label="Previous photo"
-              className="absolute left-0 top-1/2 -translate-y-1/2 rounded-token px-3 py-2 text-background transition-opacity duration-150 hover:opacity-80"
+              className="absolute left-0 top-1/2 z-10 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-token text-lg text-background transition-opacity duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:opacity-80 sm:left-2"
             >
               &larr;
             </button>
@@ -111,24 +111,28 @@ export function Lightbox({ photos, index, onClose, onNavigate }: LightboxProps) 
               type="button"
               onClick={() => onNavigate((index + 1) % photos.length)}
               aria-label="Next photo"
-              className="absolute right-0 top-1/2 -translate-y-1/2 rounded-token px-3 py-2 text-background transition-opacity duration-150 hover:opacity-80"
+              className="absolute right-0 top-1/2 z-10 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-token text-lg text-background transition-opacity duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:opacity-80 sm:right-2"
             >
               &rarr;
             </button>
           </>
         )}
 
-        <picture>
+        <picture className="mt-12 sm:mt-0">
           <source type="image/webp" srcSet={srcSet(photo.renditions)} />
           <img
             src={jpegFallback?.key}
             width={photo.width}
             height={photo.height}
             alt={photo.alt}
-            className="max-h-[80vh] w-auto rounded-token"
+            className="max-h-[70vh] w-auto max-w-full rounded-token sm:max-h-[80vh]"
           />
         </picture>
-        {photo.caption && <p className="mt-3 text-center text-sm text-background">{photo.caption}</p>}
+        {photo.caption && (
+          <p className="mt-3 max-w-prose px-2 text-center text-sm leading-relaxed text-background">
+            {photo.caption}
+          </p>
+        )}
       </div>
     </div>
   );
