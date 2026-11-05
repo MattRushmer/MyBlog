@@ -9,13 +9,24 @@ import { requireSession } from "@/server/auth/require-session";
 import { dataResponse, errorResponse, handleRouteError } from "@/server/http/envelope";
 import { deriveAltTextFromFilename, extensionFromFilename, sanitizeFilename } from "@/server/uploads/filename";
 
-const createUploadSchema = z.object({
-  filename: z.string().min(1).max(255),
-  contentType: z.string().regex(/^image\//, "contentType must be an image/* type"),
-  bytes: z.number().int().positive(),
-  kind: photoKindSchema,
-  storyId: z.string().min(1).nullable().optional(),
-});
+const createUploadSchema = z
+  .object({
+    filename: z.string().min(1).max(255),
+    contentType: z.string().regex(/^image\//, "contentType must be an image/* type"),
+    bytes: z.number().int().positive(),
+    kind: photoKindSchema,
+    storyId: z.string().min(1).nullable().optional(),
+  })
+  // The DynamoDB adapter only writes a story-photo GSI entry when
+  // kind === "story" (src/adapters/content-store/aws/index.ts), while the
+  // local adapter's listPhotosByStory filters purely on storyId regardless
+  // of kind. Any other combination makes the two modes disagree about
+  // which photos a story has, so it's rejected rather than silently
+  // accepted into an inconsistent state.
+  .refine((input) => (input.kind === "story") === (input.storyId != null), {
+    message: "storyId must be set if and only if kind is 'story'",
+    path: ["storyId"],
+  });
 
 /**
  * Step 1 of the two-step upload: records a placeholder Photo (status

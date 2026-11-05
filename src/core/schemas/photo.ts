@@ -20,7 +20,12 @@ export const photoSchema = baseEntitySchema.extend({
   status: photoStatusSchema,
   error: z.string().nullable(),
   takenAt: isoDateTimeSchema.nullable(),
-  sortOrder: z.number().int(),
+  // Non-negative: the DynamoDB adapter's story-photo GSI sort key
+  // zero-pads sortOrder and clamps negatives to 0 (src/adapters/content-
+  // store/aws/keys.ts), so a negative value here would silently collide
+  // with other photos' GSI positions in aws mode while still sorting
+  // correctly in local mode - a real local/aws behavior divergence.
+  sortOrder: z.number().int().nonnegative(),
 });
 
 export type Photo = z.infer<typeof photoSchema>;

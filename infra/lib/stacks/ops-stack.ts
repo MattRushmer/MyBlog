@@ -1,6 +1,9 @@
 import { Stack, type StackProps } from "aws-cdk-lib";
 import * as budgets from "aws-cdk-lib/aws-budgets";
 import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
+import * as cloudwatchActions from "aws-cdk-lib/aws-cloudwatch-actions";
+import * as sns from "aws-cdk-lib/aws-sns";
+import * as snsSubscriptions from "aws-cdk-lib/aws-sns-subscriptions";
 import type { Construct } from "constructs";
 
 export interface OpsStackProps extends StackProps {
@@ -40,6 +43,11 @@ export class OpsStack extends Stack {
       ],
     });
 
+    const alertTopic = new sns.Topic(this, "AlertTopic", {
+      topicName: `blog-${props.stage}-alerts`,
+    });
+    alertTopic.addSubscription(new snsSubscriptions.EmailSubscription(props.alertEmail));
+
     const errorRateMetric = new cloudwatch.Metric({
       namespace: "AWS/CloudFront",
       metricName: "5xxErrorRate",
@@ -47,7 +55,7 @@ export class OpsStack extends Stack {
       statistic: "Average",
     });
 
-    new cloudwatch.Alarm(this, "CloudFront5xxAlarm", {
+    const cloudFront5xxAlarm = new cloudwatch.Alarm(this, "CloudFront5xxAlarm", {
       alarmName: `blog-${props.stage}-cloudfront-5xx`,
       metric: errorRateMetric,
       threshold: 5,
@@ -56,5 +64,8 @@ export class OpsStack extends Stack {
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
     });
+    // Previously had no action at all - the alarm would change state
+    // without ever notifying anyone.
+    cloudFront5xxAlarm.addAlarmAction(new cloudwatchActions.SnsAction(alertTopic));
   }
 }

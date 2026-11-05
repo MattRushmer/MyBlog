@@ -95,6 +95,11 @@ export class CognitoAuthAdapter implements AuthAdapter {
       return { status: "failed", reason: "mfa_invalid" };
     }
 
+    const key = decoded.username.toLowerCase();
+    if (this.rateLimiter.isRateLimited(key)) {
+      return { status: "failed", reason: "rate_limited" };
+    }
+
     try {
       const response = await this.options.client.send(
         new RespondToAuthChallengeCommand({
@@ -110,10 +115,13 @@ export class CognitoAuthAdapter implements AuthAdapter {
       );
 
       if (response.AuthenticationResult?.IdToken) {
+        this.rateLimiter.recordSuccess(key);
         return this.buildAuthenticatedResult(response.AuthenticationResult.IdToken, response.AuthenticationResult.RefreshToken);
       }
+      this.rateLimiter.recordFailure(key);
       return { status: "failed", reason: "mfa_invalid" };
     } catch {
+      this.rateLimiter.recordFailure(key);
       return { status: "failed", reason: "mfa_invalid" };
     }
   }
