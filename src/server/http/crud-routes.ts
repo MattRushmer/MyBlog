@@ -18,8 +18,8 @@ interface ListCreateConfig<T extends EntityType, TInput> {
   readonly inputSchema: z.ZodType<TInput>;
   /** Merge the parsed input into a full, storable entity. Server supplies id/timestamps. */
   readonly buildEntity: (input: TInput, id: string, now: string) => EntityMap[T];
-  /** Extra validation the zod schema can't express (e.g. registry membership). Throw ValidationError. */
-  readonly validateInput?: (input: TInput) => void;
+  /** Extra validation the zod schema can't express (e.g. registry membership, slug uniqueness). Throw ValidationError. */
+  readonly validateInput?: (input: TInput) => void | Promise<void>;
 }
 
 /** GET (list, always includes drafts for admin) + POST (create) for one entity type. */
@@ -40,7 +40,7 @@ export function createListCreateHandlers<T extends EntityType, TInput>(config: L
       await requireSession();
       const body = await request.json();
       const input = config.inputSchema.parse(body);
-      config.validateInput?.(input);
+      await config.validateInput?.(input);
 
       const now = new Date().toISOString();
       const entity = config.buildEntity(input, createId(), now);
@@ -60,7 +60,8 @@ export function createListCreateHandlers<T extends EntityType, TInput>(config: L
 interface ItemConfig<T extends EntityType, TPatch> {
   readonly type: T;
   readonly patchSchema: z.ZodType<TPatch>;
-  readonly validatePatch?: (patch: TPatch) => void;
+  /** `id` is the item being patched, so a uniqueness check can exclude itself. */
+  readonly validatePatch?: (patch: TPatch, id: string) => void | Promise<void>;
   /** Adds server-computed fields (e.g. recomputed readingTimeMinutes) alongside the parsed patch. */
   readonly transformPatch?: (patch: TPatch) => Partial<Omit<EntityMap[T], "id" | "createdAt">>;
   /** Runs after the entity is confirmed to exist, before the content-store delete. */
@@ -88,7 +89,7 @@ export function createItemHandlers<T extends EntityType, TPatch>(config: ItemCon
       const { id } = await context.params;
       const body = await request.json();
       const patch = config.patchSchema.parse(body);
-      config.validatePatch?.(patch);
+      await config.validatePatch?.(patch, id);
 
       const changes = {
         ...(patch as Partial<Omit<EntityMap[T], "id" | "createdAt">>),
