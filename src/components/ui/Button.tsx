@@ -1,16 +1,21 @@
 import type { ButtonHTMLAttributes, AnchorHTMLAttributes, ReactNode } from "react";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "warm" | "secondary" | "ghost";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: "bg-accent text-accent-foreground hover:bg-accent-hover",
+  primary:
+    "bg-[image:var(--gradient-sky-button)] text-accent-foreground shadow-sm shadow-accent/20 " +
+    "hover:shadow-md hover:shadow-accent/30 hover:brightness-110",
+  warm:
+    "bg-[image:var(--gradient-warm-button)] text-accent-warm-foreground shadow-sm shadow-accent-warm/20 " +
+    "hover:shadow-md hover:shadow-accent-warm/30 hover:brightness-110",
   secondary: "bg-surface text-foreground border border-border hover:border-accent",
   ghost: "text-foreground hover:bg-surface",
 };
 
 const BASE_CLASSES =
   "inline-flex min-h-11 items-center justify-center gap-2 rounded-token px-4 py-2 text-sm font-medium " +
-  "transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] " +
+  "transition-[color,background-color,box-shadow,filter] duration-[var(--motion-duration-base)] ease-[var(--motion-ease)] " +
   "disabled:opacity-50 disabled:pointer-events-none";
 
 interface ButtonOwnProps {

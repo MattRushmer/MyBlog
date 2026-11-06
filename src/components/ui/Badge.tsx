@@ -1,7 +1,8 @@
-type BadgeTone = "accent" | "neutral";
+type BadgeTone = "accent" | "warm" | "neutral";
 
 const TONE_CLASSES: Record<BadgeTone, string> = {
   accent: "bg-accent/10 text-accent",
+  warm: "bg-accent-warm/10 text-accent-warm",
   neutral: "bg-border text-muted",
 };
 
