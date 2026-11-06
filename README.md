@@ -53,7 +53,8 @@ projects, certifications, and links — all without touching code.
 ## What this is
 
 - **Home, Stories, Photos, Projects, Certifications, Links** — public pages,
-  server-rendered, mobile-first, one accent colour, no dark-mode toggle
+  server-rendered, mobile-first, a sky blue / cloudy white palette with
+  verified-accessible amber-red gradient accents, no dark-mode toggle
   (deliberately out of scope), WCAG AA contrast.
 - **`/admin`** — single-owner login (local: username + password; AWS: Cognito
   with required MFA), Markdown story editor with live preview, drag-and-drop
@@ -224,7 +225,9 @@ tested before the next started:
 7. Design tokens — a single light theme (plain hex values, not oklch,
    specifically so contrast ratios could be checked directly against
    WCAG's relative-luminance formula: accent `#0f766e` on white is 5.47:1,
-   well past the 4.5:1 AA floor).
+   well past the 4.5:1 AA floor). This teal palette was later replaced in
+   the [Phase 5 redesign](#phase-5--visual-redesign) — the plain-hex,
+   verify-don't-eyeball approach it established stuck around.
 8. The seed script — auto-generates a random admin password on first run
    (printed once, never a hardcoded default) and seeds realistic
    placeholder content, including **real photos run through the actual
@@ -356,6 +359,44 @@ architecture. Fixed by allowing `'unsafe-inline'` for scripts specifically
 (a deliberate, documented tradeoff) while keeping `frame-ancestors`,
 `object-src`, and `base-uri` strict. Verified live in a browser,
 post-fix, including the full admin login → dashboard flow.
+
+### Phase 5 — Visual redesign
+
+A deliberate follow-up pass replaced the original single-teal-accent palette
+with a sky blue / cloudy white theme with amber-red ("warm") gradient
+accents — a cleaner-yet-more-eye-catching direction than the original
+restrained design. All colour tokens live in one file
+(`app/globals.css`), so the whole visual system could be swapped without
+touching component logic; a `grep` across `src/` and `app/` confirmed no
+component had a hardcoded hex colour outside that file before the change
+was made.
+
+The main risk with any gradient-heavy palette is accessibility: a gradient
+that looks fine at a glance can still fail WCAG contrast partway along its
+stops, even when both endpoints individually pass. Every new token and
+gradient was checked against the sRGB relative-luminance formula with
+throwaway Node scripts before being wired into a component — not eyeballed:
+
+- Every text/background and button-fill/text colour pair clears the 4.5:1
+  AA floor (e.g. accent `#0369a1` on white is 5.93:1; accent-warm `#c2410c`
+  on white is 5.18:1).
+- Gradients are tiered by where they're allowed to appear, because the
+  brightest stops (e.g. sky-500, used for background glows) fail AA on
+  their own: a **decorative** tier for background blobs and the header's
+  gradient bar (never under text), a **button-safe** tier restricted to
+  accent → accent-hover for solid button fills, and a **text-safe** tier
+  for `.gradient-text` headings, each sampled at multiple points along the
+  gradient (not just the endpoints, since contrast is non-linear across a
+  CSS gradient) against the surface it actually renders on.
+
+Verified after the change: `tsc --noEmit` and `eslint` clean, all 52
+Vitest tests still passing, and a full visual pass across every public
+page (home, stories list/detail, photos gallery, projects, certifications,
+links) and the admin flow (dashboard, stories/certifications management)
+in a real browser. The three project-convention files
+(`AGENTS.md`/`CLAUDE.md`/`.cursor/rules/project.md`) and this README were
+updated to describe the new palette and its contrast rationale, and
+`docs/screenshots/*.jpg` were regenerated against the redesigned site.
 
 ### What's still open
 
