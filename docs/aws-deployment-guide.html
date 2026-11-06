@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>AWS Deployment Guide</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a2332;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .cover {
+    min-height: 240mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    page-break-after: always;
+  }
+  .cover .kicker {
+    color: #0f766e;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 11pt;
+    margin-bottom: 14px;
+  }
+  .cover h1 {
+    font-size: 30pt;
+    margin: 0 0 10px 0;
+    color: #0f172a;
+    line-height: 1.15;
+  }
+  .cover .subtitle {
+    font-size: 13pt;
+    color: #475569;
+    max-width: 440px;
+    margin-bottom: 40px;
+  }
+  .cover .meta {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 18px;
+    color: #64748b;
+    font-size: 9.5pt;
+  }
+  .cover .meta div { margin-bottom: 4px; }
+  .cover .cost-box {
+    margin-top: 36px;
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    border-radius: 8px;
+    padding: 16px 20px;
+    max-width: 440px;
+  }
+  .cover .cost-box .label {
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #0f766e;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .cover .cost-box .value {
+    font-size: 16pt;
+    font-weight: 700;
+    color: #0f172a;
+  }
+  .toc { page-break-after: always; }
+  .toc h2 { font-size: 16pt; margin-bottom: 18px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 7px; font-size: 10.5pt; }
+  .toc a { color: #0f172a; text-decoration: none; }
+  .toc .num { color: #0f766e; font-weight: 600; margin-right: 6px; }
+
+  h2 {
+    font-size: 15pt;
+    color: #0f172a;
+    border-bottom: 2px solid #0f766e;
+    padding-bottom: 6px;
+    margin-top: 30px;
+    margin-bottom: 14px;
+    page-break-after: avoid;
+  }
+  h2 .step-num {
+    display: inline-block;
+    background: #0f766e;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    font-size: 11pt;
+    margin-right: 10px;
+  }
+  h3 {
+    font-size: 11.5pt;
+    color: #115e59;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  p { margin: 0 0 10px 0; }
+  ul, ol { margin: 0 0 12px 0; padding-left: 22px; }
+  li { margin-bottom: 4px; }
+  a { color: #0f766e; }
+
+  code {
+    font-family: "Consolas", "SFMono-Regular", Menlo, monospace;
+    font-size: 9pt;
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #115e59;
+  }
+  pre {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 12px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: "Consolas", "SFMono-Regular", Menlo, monospace;
+    font-size: 8.8pt;
+    line-height: 1.5;
+    margin: 0 0 14px 0;
+    page-break-inside: avoid;
+  }
+  pre code { background: none; color: inherit; padding: 0; }
+  pre .comment { color: #64748b; }
+
+  .callout {
+    border-left: 4px solid #0f766e;
+    background: #f0fdfa;
+    padding: 10px 14px;
+    margin: 0 0 14px 0;
+    border-radius: 0 6px 6px 0;
+    page-break-inside: avoid;
+  }
+  .callout.warn {
+    border-left-color: #b45309;
+    background: #fffbeb;
+  }
+  .callout.danger {
+    border-left-color: #b91c1c;
+    background: #fef2f2;
+  }
+  .callout .label {
+    font-weight: 700;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+    color: #0f766e;
+  }
+  .callout.warn .label { color: #b45309; }
+  .callout.danger .label { color: #b91c1c; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 14px 0;
+    font-size: 9.5pt;
+  }
+  th, td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+  }
+  th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .step-section { page-break-inside: avoid; }
+  .links-list li { margin-bottom: 6px; }
+  .links-list .link-label { font-weight: 600; }
+  footer {
+    margin-top: 40px;
+    padding-top: 10px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 8.5pt;
+    color: #94a3b8;
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="kicker">Deployment Guide</div>
+  <h1>Deploying Matt Rushmer&rsquo;s Blog<br>to AWS</h1>
+  <div class="subtitle">
+    A complete, step-by-step walkthrough for taking this local-first Next.js
+    site from <code>npm run dev</code> to a live, AWS-hosted deployment using
+    the project&rsquo;s own AWS CDK infrastructure.
+  </div>
+  <div class="cost-box">
+    <div class="label">Estimated monthly cost once deployed</div>
+    <div class="value">≈ $0.55 &ndash; $2.40 / month</div>
+  </div>
+  <div class="meta">
+    <div>Region: <strong>ap-southeast-2</strong> (Sydney)</div>
+    <div>Infrastructure: AWS CDK v2 (TypeScript), OpenNext for Next.js on Lambda</div>
+    <div>Covers: account setup, CLI/CDK install, deploy, Cognito admin user + MFA, verification, redeploys, teardown</div>
+  </div>
+</div>
+
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><span class="num">1.</span><a href="#step1">Before you start</a></li>
+    <li><span class="num">2.</span><a href="#step2">Create an AWS account and an IAM user</a></li>
+    <li><span class="num">3.</span><a href="#step3">Install and configure the AWS CLI</a></li>
+    <li><span class="num">4.</span><a href="#step4">Install Node.js, the project, and the CDK CLI</a></li>
+    <li><span class="num">5.</span><a href="#step5">Bootstrap your AWS account for CDK</a></li>
+    <li><span class="num">6.</span><a href="#step6">Set the deployment configuration variables</a></li>
+    <li><span class="num">7.</span><a href="#step7">Build the deployable artifacts</a></li>
+    <li><span class="num">8.</span><a href="#step8">Preview the changes (cdk synth / cdk diff)</a></li>
+    <li><span class="num">9.</span><a href="#step9">Deploy the stacks</a></li>
+    <li><span class="num">10.</span><a href="#step10">Confirm the cost-alert email subscription</a></li>
+    <li><span class="num">11.</span><a href="#step11">Create the admin user and set up MFA</a></li>
+    <li><span class="num">12.</span><a href="#step12">Finish wiring the server&rsquo;s CDN domain</a></li>
+    <li><span class="num">13.</span><a href="#step13">Visit the site and sign in</a></li>
+    <li><span class="num">14.</span><a href="#step14">Redeploying after a code change</a></li>
+    <li><span class="num">15.</span><a href="#step15">Monitoring and the budget alarm</a></li>
+    <li><span class="num">16.</span><a href="#step16">Tearing it all down</a></li>
+    <li><span class="num">17.</span><a href="#step17">Environment variable reference</a></li>
+    <li><span class="num">18.</span><a href="#step18">Troubleshooting</a></li>
+    <li><span class="num">19.</span><a href="#step19">Reference links</a></li>
+  </ol>
+</div>
+
+<h2 id="step1"><span class="step-num">1</span>Before you start</h2>
+
+<p>
+  This project is <strong>local-first</strong>: everything works on your own
+  machine with zero AWS access via <code>npm install &amp;&amp; npm run seed
+  &amp;&amp; npm run dev</code>. Deploying to AWS is a separate, optional step
+  that this guide walks through end to end. The infrastructure is written as
+  four AWS CDK stacks (<code>infra/lib/stacks/</code>) and already
+  <code>cdk synth</code>-clean — nothing in this guide requires writing new
+  code, only running commands against an AWS account you control.
+</p>
+
+<div class="callout warn">
+  <div class="label">This creates billable AWS resources</div>
+  <p>
+    Every step from <a href="#step9">Deploy the stacks</a> onward creates real
+    AWS resources. At personal-site traffic the whole stack costs well under
+    $3/month (see the cost box on the cover page), and a CloudWatch budget
+    alarm is deployed automatically to flag anything unexpected — but you
+    should still only run <code>cdk deploy</code> when you intend to.
+  </p>
+</div>
+
+<p>What you'll end up with:</p>
+<ul>
+  <li>A DynamoDB table for content, an S3 bucket for photos behind CloudFront, and a Lambda that serves the whole Next.js app.</li>
+  <li>A Cognito user pool with a single admin account, MFA required.</li>
+  <li>A CloudWatch budget alarm and a 5xx-error alarm, both emailing you.</li>
+  <li>A live HTTPS URL (on the default <code>*.cloudfront.net</code> domain — no custom domain is configured by this project yet).</li>
+</ul>
+
+<h2 id="step2"><span class="step-num">2</span>Create an AWS account and an IAM user</h2>
+
+<p>
+  If you don't already have an AWS account, create one at
+  <a href="https://portal.aws.amazon.com/billing/signup">aws.amazon.com/signup</a>.
+  You'll need a credit card and a phone number for verification.
+</p>
+
+<div class="callout danger">
+  <div class="label">Don't use your root account day to day</div>
+  <p>
+    AWS's own guidance is to create a separate IAM user (or IAM Identity
+    Center user) for everyday work and keep the root account locked away for
+    account-level tasks only. See
+    <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html">IAM best practices</a>.
+  </p>
+</div>
+
+<h3>Create an IAM user for deployment</h3>
+<ol>
+  <li>Sign in to the <a href="https://console.aws.amazon.com/iam/">IAM console</a> as the root user (first time only).</li>
+  <li>Go to <strong>Users → Create user</strong>. Name it something like <code>blog-deployer</code>.</li>
+  <li>Attach the <code>AdministratorAccess</code> managed policy for now — CDK deploys create IAM roles, Lambda functions, S3 buckets, CloudFront distributions, Cognito pools, and more, and scoping a minimal policy for all of that is a project of its own. Once the stack is stable, you can tighten this.</li>
+  <li>Under <strong>Security credentials</strong>, create an <strong>access key</strong> (choose "Command Line Interface (CLI)" as the use case). Save the Access Key ID and Secret Access Key somewhere safe — the secret is shown only once.</li>
+</ol>
+<p>Full walkthrough: <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html">Creating IAM users</a>.</p>
+
+<h2 id="step3"><span class="step-num">3</span>Install and configure the AWS CLI</h2>
+
+<p>Install the AWS CLI v2 for your platform: <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">Installing the AWS CLI</a>.</p>
+
+<pre>aws --version
+<span class="comment"># should print something like aws-cli/2.x.x</span></pre>
+
+<p>Configure it with the access key from Step 2:</p>
+
+<pre>aws configure
+<span class="comment"># AWS Access Key ID:     &lt;paste&gt;
+# AWS Secret Access Key: &lt;paste&gt;
+# Default region name:   ap-southeast-2
+# Default output format: json</span></pre>
+
+<p>Verify it works:</p>
+<pre>aws sts get-caller-identity</pre>
+
+<p>Full reference: <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html">Configuring the AWS CLI</a>.</p>
+
+<h2 id="step4"><span class="step-num">4</span>Install Node.js, the project, and the CDK CLI</h2>
+
+<ol>
+  <li>
+    Install Node.js 22 or later from <a href="https://nodejs.org/">nodejs.org</a>
+    (the project pins Lambda runtimes to <code>nodejs22.x</code>).
+  </li>
+  <li>
+    Clone the repository and install dependencies:
+    <pre>git clone https://github.com/MattRushmer/MyBlog.git
+cd MyBlog
+npm install</pre>
+    <code>npm install</code> installs both the Next.js app's dependencies and
+    the <code>infra/</code> CDK workspace's dependencies in one step (they're
+    linked as npm workspaces).
+  </li>
+  <li>
+    Install the CDK CLI globally (or use <code>npx cdk</code> everywhere
+    below instead):
+    <pre>npm install -g aws-cdk
+cdk --version</pre>
+  </li>
+</ol>
+
+<p>
+  Background on the CDK toolkit: <a href="https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html">Getting started with the AWS CDK</a>.
+</p>
+
+<h2 id="step5"><span class="step-num">5</span>Bootstrap your AWS account for CDK</h2>
+
+<p>
+  CDK needs a small set of support resources (an S3 bucket for deployment
+  assets, IAM roles) in your target account/region before it can deploy
+  anything. This is a one-time step per account + region:
+</p>
+
+<pre>cdk bootstrap aws://&lt;YOUR_ACCOUNT_ID&gt;/ap-southeast-2
+<span class="comment"># find YOUR_ACCOUNT_ID with: aws sts get-caller-identity --query Account --output text</span></pre>
+
+<p>Details: <a href="https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html">Bootstrapping your AWS environment</a>.</p>
+
+<h2 id="step6"><span class="step-num">6</span>Set the deployment configuration variables</h2>
+
+<p>
+  <code>infra/bin/app.ts</code> reads these as real shell environment
+  variables (not from <code>.env.local</code> — that file configures the
+  <em>application</em>, this configures the <em>CDK app</em> that builds the
+  infrastructure). All of them have safe defaults for <code>cdk synth</code>,
+  but you should set them explicitly for a real deploy:
+</p>
+
+<table>
+  <tr><th>Variable</th><th>Purpose</th><th>Example</th></tr>
+  <tr><td><code>STAGE</code></td><td>Suffixes every stack/resource name</td><td><code>prod</code></td></tr>
+  <tr><td><code>AWS_REGION</code></td><td>Deploy region</td><td><code>ap-southeast-2</code></td></tr>
+  <tr><td><code>ALERT_EMAIL</code></td><td>Receives budget + 5xx-alarm emails</td><td><code>you@example.com</code></td></tr>
+  <tr><td><code>CONTENT_TABLE_NAME</code></td><td>DynamoDB content table name (optional, has a default)</td><td><code>blog-content-prod</code></td></tr>
+  <tr><td><code>ISR_TABLE_NAME</code></td><td>DynamoDB ISR cache table name (optional)</td><td><code>blog-isr-prod</code></td></tr>
+  <tr><td><code>PHOTOS_BUCKET_NAME</code></td><td>S3 bucket name (optional — defaults to a name derived from your account ID, which is globally unique)</td><td><code>blog-photos-prod-123456789012</code></td></tr>
+</table>
+
+<p>Set them for your current shell session (PowerShell example — adjust for bash/zsh):</p>
+
+<pre>$env:STAGE = "prod"
+$env:AWS_REGION = "ap-southeast-2"
+$env:ALERT_EMAIL = "you@example.com"</pre>
+
+<div class="callout">
+  <div class="label">Only ALERT_EMAIL and STAGE are strictly required</div>
+  <p>
+    The table/bucket names fall back to sensible auto-generated defaults
+    (<code>blog-content-&lt;stage&gt;</code>, etc., with the bucket name
+    including your AWS account ID so it's globally unique). Set
+    <code>ALERT_EMAIL</code> to a real address you can check — you'll need to
+    confirm an SNS subscription email after the first deploy.
+  </p>
+</div>
+
+<h2 id="step7"><span class="step-num">7</span>Build the deployable artifacts</h2>
+
+<p>
+  Two things need building before CDK can package them: the OpenNext bundle
+  (the Next.js app, compiled for Lambda) and the <code>sharp</code> image
+  library's native binary for Lambda's <code>linux/arm64</code> runtime (the
+  <code>infra</code> deploy scripts build this one automatically, so you only
+  need the first step yourself):
+</p>
+
+<pre>npm run build:open-next
+<span class="comment"># produces .open-next/ — the server function, static assets, the
+# revalidation function, etc. SiteStack reads directly from this folder.</span></pre>
+
+<div class="callout warn">
+  <div class="label">Run this again after every code change</div>
+  <p>
+    <code>.open-next/</code> is a build output (git-ignored) — it reflects
+    whatever source code was checked out when you last ran this command, not
+    automatically your latest edits. Re-run it before every
+    <code>cdk diff</code> or <code>cdk deploy</code> you expect to reflect
+    new code.
+  </p>
+</div>
+
+<h2 id="step8"><span class="step-num">8</span>Preview the changes</h2>
+
+<p>Sanity-check the whole stack synthesizes with no AWS access required:</p>
+<pre>npm run infra:synth</pre>
+
+<p>
+  Once you have real credentials configured (Steps 2&ndash;3), preview exactly
+  what a deploy would create or change:
+</p>
+<pre>npm run infra:diff</pre>
+
+<p>
+  The first time, this will show every resource as new (DynamoDB tables, the
+  S3 buckets, the Cognito pool, the CloudFront distribution, the Lambda
+  functions, IAM roles, the SNS topic, the budget). Review it — this is the
+  last point before anything billable gets created.
+</p>
+
+<h2 id="step9"><span class="step-num">9</span>Deploy the stacks</h2>
+
+<pre>npm --prefix infra run deploy -- --all</pre>
+
+<p>
+  This runs the <code>sharp</code> layer build automatically, then
+  <code>cdk deploy --all</code>, which deploys <code>DataStack</code>,
+  <code>AuthStack</code>, <code>SiteStack</code>, and <code>OpsStack</code>
+  in the correct dependency order (CDK resolves this automatically from the
+  cross-stack references — <code>SiteStack</code> depends on tables from
+  <code>DataStack</code> and the user pool from <code>AuthStack</code>, for
+  instance). CDK will prompt you to confirm IAM changes for each stack —
+  review and approve.
+</p>
+
+<p>
+  This takes several minutes, mostly CloudFront distribution creation.
+  When it finishes, each stack prints its outputs — note down:
+</p>
+<ul>
+  <li><strong>SiteUrlOutput</strong> (from <code>BlogSiteStack-&lt;stage&gt;</code>) — your live URL.</li>
+  <li><strong>ServerFunctionNameOutput</strong> — needed in Step 12.</li>
+  <li><strong>UserPoolIdOutput</strong> and <strong>UserPoolClientIdOutput</strong> (from <code>BlogAuthStack-&lt;stage&gt;</code>) — needed in Step 11.</li>
+</ul>
+
+<p>
+  If you ever lose these, retrieve them again with:
+</p>
+<pre>aws cloudformation describe-stacks --stack-name BlogSiteStack-prod --query "Stacks[0].Outputs"
+aws cloudformation describe-stacks --stack-name BlogAuthStack-prod --query "Stacks[0].Outputs"</pre>
+
+<h2 id="step10"><span class="step-num">10</span>Confirm the cost-alert email subscription</h2>
+
+<p>
+  <code>OpsStack</code> creates an SNS topic subscribed to <code>ALERT_EMAIL</code>
+  and attaches it to the CloudFront 5xx-error alarm. AWS sends a confirmation
+  email immediately after deploy — <strong>open it and click
+  "Confirm subscription"</strong>, or you won't actually receive alerts.
+</p>
+
+<h2 id="step11"><span class="step-num">11</span>Create the admin user and set up MFA</h2>
+
+<p>
+  Self-signup is disabled — the admin account has to be created directly via
+  the AWS CLI, and because the pool requires TOTP MFA for every user, the
+  first sign-in has to walk through MFA setup too. There's no UI for this
+  (no Cognito Hosted UI is deployed — the app talks to Cognito directly), so
+  it's all CLI, once, ever.
+</p>
+
+<h3>11.1 — Create the user</h3>
+<pre>aws cognito-idp admin-create-user \
+  --user-pool-id &lt;USER_POOL_ID&gt; \
+  --username admin \
+  --temporary-password "TempPass!23456" \
+  --message-action SUPPRESS</pre>
+<p>Use a strong temporary password meeting the pool's policy (12+ characters, upper + lower + digit + symbol). <code>--message-action SUPPRESS</code> is required — the pool has no verified email/phone to send an invite to.</p>
+
+<h3>11.2 — Sign in once to set a permanent password</h3>
+<pre>aws cognito-idp initiate-auth \
+  --client-id &lt;USER_POOL_CLIENT_ID&gt; \
+  --auth-flow USER_PASSWORD_AUTH \
+  --auth-parameters USERNAME=admin,PASSWORD="TempPass!23456"</pre>
+<p>
+  The response has <code>"ChallengeName": "NEW_PASSWORD_REQUIRED"</code> and a
+  <code>"Session"</code> string. Copy that session value, then:
+</p>
+<pre>aws cognito-idp respond-to-auth-challenge \
+  --client-id &lt;USER_POOL_CLIENT_ID&gt; \
+  --challenge-name NEW_PASSWORD_REQUIRED \
+  --session "&lt;SESSION_FROM_PREVIOUS_RESPONSE&gt;" \
+  --challenge-responses USERNAME=admin,NEW_PASSWORD="YourRealPassword!456"</pre>
+
+<h3>11.3 — Set up the authenticator app (TOTP)</h3>
+<p>
+  Because MFA is required and this user has none configured yet, the
+  response to 11.2 comes back with
+  <code>"ChallengeName": "MFA_SETUP"</code> and a new <code>"Session"</code>.
+  Use it to get a TOTP secret:
+</p>
+<pre>aws cognito-idp associate-software-token \
+  --session "&lt;SESSION_FROM_11.2&gt;"</pre>
+<p>
+  The response includes a <code>"SecretCode"</code> (a base32 string) and
+  another new <code>"Session"</code>. Open an authenticator app (Google
+  Authenticator, Authy, 1Password, etc.), choose "enter a setup key manually"
+  / "can't scan the QR code", and enter the <code>SecretCode</code> — the app
+  will start generating 6-digit codes.
+</p>
+<p>Verify the code it just generated:</p>
+<pre>aws cognito-idp verify-software-token \
+  --session "&lt;SESSION_FROM_ASSOCIATE_STEP&gt;" \
+  --user-code "123456"</pre>
+<p>A successful response has <code>"Status": "SUCCESS"</code> and yet another new <code>"Session"</code>.</p>
+
+<h3>11.4 — Complete sign-in</h3>
+<pre>aws cognito-idp respond-to-auth-challenge \
+  --client-id &lt;USER_POOL_CLIENT_ID&gt; \
+  --challenge-name MFA_SETUP \
+  --session "&lt;SESSION_FROM_VERIFY_STEP&gt;" \
+  --challenge-responses USERNAME=admin</pre>
+<p>
+  This should finally return a real <code>AuthenticationResult</code> with
+  tokens — confirming the account is fully set up. From now on, signing in
+  (through the deployed site's own <code>/admin/login</code> page) only needs
+  the username, the real password from 11.2, and a fresh 6-digit code from
+  the authenticator app each time.
+</p>
+
+<p>Reference: <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html">Adding MFA to a user pool</a>, <a href="https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/associate-software-token.html">associate-software-token CLI reference</a>.</p>
+
+<h2 id="step12"><span class="step-num">12</span>Finish wiring the server&rsquo;s CDN domain</h2>
+
+<p>
+  This is a known, deliberate gap documented directly in
+  <code>infra/lib/stacks/site-stack.ts</code>: the server Lambda can't be
+  told its own CloudFront domain at deploy time, because doing so would
+  create a circular CloudFormation dependency (the Lambda is the
+  distribution's origin, so the distribution can't be declared as a
+  dependency of the Lambda's own configuration). It has to be patched in
+  once, manually, right after the first deploy.
+</p>
+
+<ol>
+  <li>Get the distribution domain from the <code>SiteUrlOutput</code> you noted in Step 9 (or re-fetch it per Step 9's last command).</li>
+  <li>
+    Open the <a href="https://console.aws.amazon.com/lambda/">Lambda console</a>,
+    find the function named in <code>ServerFunctionNameOutput</code>
+    (e.g. <code>blog-server-prod</code>), go to
+    <strong>Configuration → Environment variables → Edit</strong>, and add two
+    new variables without removing any existing ones:
+    <ul>
+      <li><code>CDN_DOMAIN</code> = the distribution's domain (no <code>https://</code>, just the hostname, e.g. <code>d123abc456.cloudfront.net</code>)</li>
+      <li><code>SITE_URL</code> = <code>https://</code> + that same domain</li>
+    </ul>
+  </li>
+  <li>Save. The change takes effect on the next invocation — no redeploy needed.</li>
+</ol>
+
+<div class="callout warn">
+  <div class="label">This gets reverted by the next cdk deploy</div>
+  <p>
+    CDK manages this Lambda's environment variables declaratively from
+    <code>SiteStack</code>'s source code, which doesn't know about
+    <code>CDN_DOMAIN</code>/<code>SITE_URL</code> — so a future
+    <code>cdk deploy</code> will overwrite the whole environment variable set
+    back to only what's declared in code, silently dropping both. Redo this
+    step after every redeploy (Step 14) until the code is changed to source
+    these automatically (e.g. via a custom resource, or once a stable custom
+    domain exists to hard-code instead).
+  </p>
+</div>
+
+<h2 id="step13"><span class="step-num">13</span>Visit the site and sign in</h2>
+
+<ol>
+  <li>Open the URL from <code>SiteUrlOutput</code> in a browser — you should see the home page, exactly like local mode but served from CloudFront.</li>
+  <li>Go to <code>/admin/login</code>, sign in with <code>admin</code> / the real password from Step 11.2.</li>
+  <li>Enter the 6-digit code from your authenticator app when prompted.</li>
+  <li>You're in. The content store is empty (a fresh DynamoDB table) — create your first story, project, certification, and link from here.</li>
+</ol>
+
+<p>
+  There is currently no script to migrate existing local (<code>./data</code>)
+  content into AWS mode — if you've been writing content locally, you'll need
+  to re-create it through this admin UI once, or write a one-off migration
+  script against the <code>ContentStore</code>/<code>FileStorage</code>
+  adapter interfaces (<code>src/adapters/</code>) yourself.
+</p>
+
+<h2 id="step14"><span class="step-num">14</span>Redeploying after a code change</h2>
+
+<pre>npm run build:open-next
+npm --prefix infra run deploy -- --all</pre>
+
+<p>
+  Re-run <a href="#step12">Step 12</a> afterward if the server function's
+  environment variables got reset (they will be, every time, until that gap
+  is closed in code — see the warning above).
+</p>
+
+<h2 id="step15"><span class="step-num">15</span>Monitoring and the budget alarm</h2>
+
+<ul>
+  <li><strong>Budget:</strong> <code>OpsStack</code> creates an AWS Budget capped at $10/month, emailing <code>ALERT_EMAIL</code> at 80% actual spend. View/adjust it in the <a href="https://console.aws.amazon.com/billing/home#/budgets">Billing console → Budgets</a>.</li>
+  <li><strong>5xx alarm:</strong> A CloudWatch alarm on the CloudFront distribution's 5xx error rate, emailing the same address via the SNS topic from Step 10.</li>
+  <li><strong>Logs:</strong> Lambda execution logs land in CloudWatch Logs under <code>/aws/lambda/blog-server-&lt;stage&gt;</code> and <code>/aws/lambda/blog-image-resize-&lt;stage&gt;</code> (actual log group name: look it up in the <a href="https://console.aws.amazon.com/cloudwatch/home#logsV2:log-groups">CloudWatch console</a>).</li>
+</ul>
+
+<h2 id="step16"><span class="step-num">16</span>Tearing it all down</h2>
+
+<pre>npm --prefix infra run destroy -- --all</pre>
+
+<div class="callout danger">
+  <div class="label">Some resources survive destroy on purpose</div>
+  <p>
+    The content DynamoDB table and the photos S3 bucket both have
+    <code>RemovalPolicy.RETAIN</code> — deliberately, so a stack teardown can
+    never silently delete real content. They'll remain in your account (and
+    keep costing a small amount) after <code>cdk destroy</code> completes. To
+    actually remove them: empty the S3 bucket first (a bucket with objects in
+    it can't be deleted), then delete both the bucket and the DynamoDB table
+    manually via the console or CLI.
+  </p>
+</div>
+
+<p>Reference: <a href="https://docs.aws.amazon.com/cdk/v2/guide/cli.html">AWS CDK CLI reference</a> (see the <code>destroy</code> command).</p>
+
+<h2 id="step17"><span class="step-num">17</span>Environment variable reference</h2>
+
+<h3>Read by the CDK app (infra/bin/app.ts) — shell environment variables</h3>
+<table>
+  <tr><th>Variable</th><th>Required</th><th>Default</th></tr>
+  <tr><td><code>STAGE</code></td><td>No</td><td><code>dev</code></td></tr>
+  <tr><td><code>AWS_REGION</code></td><td>No</td><td><code>ap-southeast-2</code></td></tr>
+  <tr><td><code>ALERT_EMAIL</code></td><td>Recommended</td><td><code>placeholder@example.com</code> (won't receive real alerts)</td></tr>
+  <tr><td><code>CONTENT_TABLE_NAME</code></td><td>No</td><td><code>blog-content-&lt;stage&gt;</code></td></tr>
+  <tr><td><code>ISR_TABLE_NAME</code></td><td>No</td><td><code>blog-isr-&lt;stage&gt;</code></td></tr>
+  <tr><td><code>PHOTOS_BUCKET_NAME</code></td><td>No</td><td><code>blog-photos-&lt;stage&gt;-&lt;account-id&gt;</code></td></tr>
+</table>
+
+<h3>Read by the deployed app (set automatically by SiteStack, plus two manual ones)</h3>
+<table>
+  <tr><th>Variable</th><th>Source</th></tr>
+  <tr><td><code>DEPLOY_TARGET</code></td><td>Set by CDK — always <code>aws</code></td></tr>
+  <tr><td><code>CONTENT_TABLE_NAME</code>, <code>ISR_TABLE_NAME</code>, <code>PHOTOS_BUCKET_NAME</code></td><td>Set by CDK, from the values above</td></tr>
+  <tr><td><code>COGNITO_USER_POOL_ID</code>, <code>COGNITO_CLIENT_ID</code></td><td>Set by CDK automatically</td></tr>
+  <tr><td><code>CDN_DOMAIN</code>, <code>SITE_URL</code></td><td><strong>Manual</strong> — Step 12, every deploy</td></tr>
+</table>
+
+<h2 id="step18"><span class="step-num">18</span>Troubleshooting</h2>
+
+<table>
+  <tr><th>Symptom</th><th>Likely cause / fix</th></tr>
+  <tr>
+    <td>Every page 500s after deploy</td>
+    <td>Usually <code>CDN_DOMAIN</code>/<code>SITE_URL</code> missing or a stale deploy of <code>.open-next</code> — redo Step 7 then Step 12.</td>
+  </tr>
+  <tr>
+    <td><code>cdk deploy</code> fails with a bucket-name collision</td>
+    <td>S3 bucket names are globally unique across <em>all</em> AWS accounts. Set <code>PHOTOS_BUCKET_NAME</code> explicitly to something unambiguous.</td>
+  </tr>
+  <tr>
+    <td><code>initiate-auth</code> returns <code>NotAuthorizedException</code></td>
+    <td>Wrong password, or the account hasn't completed the Step 11 challenge sequence yet — Cognito won't allow normal sign-in until MFA setup is finished.</td>
+  </tr>
+  <tr>
+    <td>Admin login works but photo uploads fail</td>
+    <td>Check the browser console / Network tab for a 403 from the presigned S3 URL — usually means the S3 bucket's CORS policy doesn't match the origin you're testing from (CORS is currently <code>allowedOrigins: ["*"]</code>, so this should be rare).</td>
+  </tr>
+  <tr>
+    <td><code>cdk bootstrap</code> / <code>cdk deploy</code> asks for approval repeatedly</td>
+    <td>Expected — every IAM-affecting change needs explicit approval unless you pass <code>--require-approval never</code> (not recommended for a stack with this many IAM statements).</td>
+  </tr>
+</table>
+
+<h2 id="step19"><span class="step-num">19</span>Reference links</h2>
+
+<ul class="links-list">
+  <li><span class="link-label">AWS account sign-up —</span> <a href="https://portal.aws.amazon.com/billing/signup">portal.aws.amazon.com/billing/signup</a></li>
+  <li><span class="link-label">IAM best practices —</span> <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html">docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html</a></li>
+  <li><span class="link-label">Creating IAM users —</span> <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html">docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html</a></li>
+  <li><span class="link-label">Installing the AWS CLI —</span> <a href="https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html">docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html</a></li>
+  <li><span class="link-label">Configuring the AWS CLI —</span> <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html">docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html</a></li>
+  <li><span class="link-label">Node.js downloads —</span> <a href="https://nodejs.org/">nodejs.org</a></li>
+  <li><span class="link-label">Getting started with the AWS CDK —</span> <a href="https://docs.aws.amazon.com/cdk/v2/guide/getting-started.html">docs.aws.amazon.com/cdk/v2/guide/getting-started.html</a></li>
+  <li><span class="link-label">CDK bootstrapping —</span> <a href="https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html">docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html</a></li>
+  <li><span class="link-label">CDK CLI reference —</span> <a href="https://docs.aws.amazon.com/cdk/v2/guide/cli.html">docs.aws.amazon.com/cdk/v2/guide/cli.html</a></li>
+  <li><span class="link-label">Adding MFA to a Cognito user pool —</span> <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html">docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-mfa.html</a></li>
+  <li><span class="link-label">Cognito admin-create-user CLI —</span> <a href="https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/admin-create-user.html">docs.aws.amazon.com/cli/latest/reference/cognito-idp/admin-create-user.html</a></li>
+  <li><span class="link-label">Cognito associate-software-token CLI —</span> <a href="https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/associate-software-token.html">docs.aws.amazon.com/cli/latest/reference/cognito-idp/associate-software-token.html</a></li>
+  <li><span class="link-label">CloudFormation describe-stacks CLI —</span> <a href="https://docs.aws.amazon.com/cli/latest/reference/cloudformation/describe-stacks.html">docs.aws.amazon.com/cli/latest/reference/cloudformation/describe-stacks.html</a></li>
+  <li><span class="link-label">Lambda console —</span> <a href="https://console.aws.amazon.com/lambda/">console.aws.amazon.com/lambda</a></li>
+  <li><span class="link-label">Billing → Budgets console —</span> <a href="https://console.aws.amazon.com/billing/home#/budgets">console.aws.amazon.com/billing/home#/budgets</a></li>
+  <li><span class="link-label">CloudWatch Logs console —</span> <a href="https://console.aws.amazon.com/cloudwatch/home#logsV2:log-groups">console.aws.amazon.com/cloudwatch/home#logsV2:log-groups</a></li>
+  <li><span class="link-label">Project repository —</span> <a href="https://github.com/MattRushmer/MyBlog">github.com/MattRushmer/MyBlog</a></li>
+</ul>
+
+<footer>
+  Generated for the MyBlog project (github.com/MattRushmer/MyBlog). Reflects the AWS CDK infrastructure as of the commit this guide was built against — re-check <code>infra/lib/stacks/</code> and <code>docs/README.md</code> if the code has moved on since.
+</footer>
+
+</body>
+</html>
