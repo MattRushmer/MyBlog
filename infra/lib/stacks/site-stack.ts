@@ -1,5 +1,5 @@
 import path from "node:path";
-import { Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
+import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import * as cognito from "aws-cdk-lib/aws-cognito";
@@ -49,6 +49,7 @@ export interface SiteStackProps extends StackProps {
 export class SiteStack extends Stack {
   public readonly distributionDomainName: string;
   public readonly distributionId: string;
+  public readonly serverFunctionName: string;
 
   constructor(scope: Construct, id: string, props: SiteStackProps) {
     super(scope, id, props);
@@ -187,5 +188,15 @@ export class SiteStack extends Stack {
 
     this.distributionDomainName = distribution.distributionDomainName;
     this.distributionId = distribution.distributionId;
+    this.serverFunctionName = serverFunction.functionName;
+
+    // Printed by `cdk deploy` and readable via `aws cloudformation
+    // describe-stacks` - the deploy runbook uses SiteUrlOutput directly and
+    // ServerFunctionNameOutput for the post-deploy CDN_DOMAIN/SITE_URL patch
+    // (see the comment on the DEPLOY_TARGET env var above for why that
+    // can't be wired in automatically here).
+    new CfnOutput(this, "DistributionDomainNameOutput", { value: this.distributionDomainName });
+    new CfnOutput(this, "SiteUrlOutput", { value: `https://${this.distributionDomainName}` });
+    new CfnOutput(this, "ServerFunctionNameOutput", { value: this.serverFunctionName });
   }
 }

@@ -1,5 +1,5 @@
 import path from "node:path";
-import { Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
+import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
@@ -148,5 +148,12 @@ export class DataStack extends Stack {
       new s3n.LambdaDestination(imageResizeFunction),
       { prefix: "originals/" },
     );
+
+    // Printed by `cdk deploy` and readable via `aws cloudformation
+    // describe-stacks` - the deploy runbook reads these instead of
+    // re-deriving resource names from source.
+    new CfnOutput(this, "ContentTableNameOutput", { value: this.contentTable.tableName });
+    new CfnOutput(this, "IsrTableNameOutput", { value: this.isrTable.tableName });
+    new CfnOutput(this, "PhotosBucketNameOutput", { value: this.photosBucket.bucketName });
   }
 }
