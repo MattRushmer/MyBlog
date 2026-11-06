@@ -11,11 +11,12 @@ const NAV_LINKS = [
 
 export function SiteHeader() {
   return (
-    <header className="border-b border-border">
+    <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur-sm">
+      <div aria-hidden className="h-[3px] bg-[image:var(--gradient-brand)]" />
       <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-4 sm:px-6 sm:py-5">
         <Link
           href="/"
-          className="inline-flex min-h-11 items-center font-serif text-lg text-foreground"
+          className="gradient-text inline-flex min-h-11 items-center font-serif text-lg font-semibold"
         >
           Matt Rushmer
         </Link>
@@ -25,7 +26,7 @@ export function SiteHeader() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="inline-flex min-h-11 items-center px-2 transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:text-foreground"
+                  className="inline-flex min-h-11 items-center px-2 transition-colors duration-[var(--motion-duration-fast)] ease-[var(--motion-ease)] hover:text-accent"
                 >
                   {link.label}
                 </Link>

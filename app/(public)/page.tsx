@@ -35,8 +35,18 @@ export default async function HomePage() {
 
   return (
     <main id="main-content" className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-      <section>
-        <h1 className="font-serif text-3xl leading-tight text-foreground sm:text-4xl">{OWNER_NAME}</h1>
+      <section className="relative">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-16 -top-24 -z-10 h-64 w-64 rounded-full bg-[image:var(--gradient-sky)] opacity-15 blur-3xl sm:h-80 sm:w-80"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-10 top-0 -z-10 h-48 w-48 rounded-full bg-[image:var(--gradient-warm)] opacity-10 blur-3xl sm:h-64 sm:w-64"
+        />
+        <h1 className="gradient-text font-serif text-3xl font-semibold leading-tight sm:text-4xl">
+          {OWNER_NAME}
+        </h1>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
           I work on security and cloud solutions - hardening infrastructure, building on AWS, and
           writing up what I learn along the way. This site collects my stories, projects, and a

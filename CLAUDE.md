@@ -10,7 +10,9 @@ so the tools never disagree on how to work here.
 A personal blog and portfolio site for **Matthew Rushmer**. Site title /
 `<title>`: **"Matt Rushmer | Security and Cloud Solutions"**. The owner logs in
 at `/admin` to write stories and manage photos without touching code. Design
-goal: calm and personal — whitespace and restraint over features.
+goal: clean yet eye-catching — a sky blue / cloudy white palette with amber-red
+accents, used through verified-accessible gradients (see "Design system"
+below), not flat single-accent minimalism.
 
 ## Tech stack (decided — do not change without asking)
 
@@ -65,6 +67,38 @@ of these, it's a regression — fix it before moving on.
 
 CDK stacks must `cdk synth` cleanly at all times. They are **not** deployed
 until explicitly instructed (see Stop-and-ask list below).
+
+## Design system
+
+All colour tokens live in `app/globals.css` (`:root`) — never hardcode a hex
+value in a component. The palette is sky blue + cloudy white with amber-red
+("warm") accents:
+
+- Background `#f5fafd`, surface `#ffffff`, foreground `#0b1f3a`, muted
+  `#3f5876`, border `#dce8f2`.
+- Accent (sky) `#0369a1` / hover `#075985` / light `#0ea5e9` (decorative only
+  — see below).
+- Accent-warm (amber-red) `#c2410c` / hover `#9a3412` / light `#ea580c`
+  (decorative only).
+
+**Gradients are tiered by where they're allowed, because a gradient's bright
+stops can fail WCAG contrast even when its endpoints individually pass** —
+contrast across a gradient must be sampled at multiple points, not just
+checked at the ends:
+
+1. **Decorative-only** (`--gradient-brand`, `--gradient-sky`,
+   `--gradient-warm`) — includes the bright `*-light` stops. Safe for
+   background glows/blobs and the thin header bar. Never put text on these.
+2. **Button-safe** (`--gradient-sky-button`, `--gradient-warm-button`) —
+   accent → accent-hover only, no bright stop. Used for solid button fills
+   with white text; verified >6:1 contrast at the midpoint.
+3. **Text-safe** (`--gradient-brand-text`) — sky-700 → ember-700 only. Used
+   for `.gradient-text` (headings, wordmark); verified >4.5:1 at 5 sample
+   points (0/25/50/75/100%) against the background.
+
+When adding a new gradient, verify contrast the same way (sample multiple
+points along it against its actual background/text pairing, not just the
+endpoints) before wiring it into anything that carries text.
 
 ## Git workflow
 
