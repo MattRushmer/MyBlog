@@ -1,6 +1,6 @@
 import sharp from "sharp";
 
-const PALETTE = ["#0f766e", "#115e59", "#0e7490", "#334155", "#475569", "#1d4e4b"];
+const PALETTE = ["#0369a1", "#075985", "#0ea5e9", "#c2410c", "#9a3412", "#0b1f3a"];
 
 /** A flat-color JPEG with a centered label, so seeded photos are unmistakably placeholders. */
 export async function createPlaceholderImage(

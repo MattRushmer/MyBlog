@@ -2,20 +2,62 @@
 
 /*
  * Single light theme by design - no dark-mode toggle (explicitly out of
- * scope). Colors are plain hex rather than oklch so contrast ratios are
- * easy to verify directly against WCAG's relative-luminance formula:
- * accent #0f766e / white is 5.47:1, well past the 4.5:1 AA floor for
- * normal text; muted #475569 / white is 7.58:1.
+ * scope). "Sky blue and cloudy white" with amber-red accents, chosen and
+ * verified against WCAG's relative-luminance formula rather than picked by
+ * eye - every token below that's used for text or a button fill clears the
+ * 4.5:1 AA floor for normal text against the surface it's actually used on:
+ *   accent #0369a1 (sky-700) vs white:        5.93:1
+ *   accent-hover #075985 (sky-800) vs white:  7.56:1
+ *   accent-warm #c2410c (ember) vs white:     5.18:1
+ *   accent-warm-hover #9a3412 vs white:       7.31:1
+ *   foreground #0b1f3a vs white:              16.52:1
+ *   muted #3f5876 vs white:                   7.32:1
+ * The brighter *-light tokens (sky-500, orange-600) fall short of 4.5:1 and
+ * are restricted to decorative/gradient use and large bold text only - see
+ * the usage notes on each.
  */
 :root {
-  --color-background: #fafaf9;
+  --color-background: #f5fafd;
   --color-surface: #ffffff;
-  --color-foreground: #0f172a;
-  --color-muted: #475569;
-  --color-border: #e2e8f0;
-  --color-accent: #0f766e;
-  --color-accent-hover: #115e59;
+  --color-foreground: #0b1f3a;
+  --color-muted: #3f5876;
+  --color-border: #dce8f2;
+
+  /* Primary accent: sky blue. Base/hover are AA-safe for text and button
+     fills; -light is decorative only (gradients, large bold text, icon
+     fills) - it does not clear 4.5:1 on its own. */
+  --color-accent: #0369a1;
+  --color-accent-hover: #075985;
+  --color-accent-light: #0ea5e9;
   --color-accent-foreground: #ffffff;
+
+  /* Secondary accent: amber-red, used sparingly for highlights (featured
+     items, in-progress states, a hero accent) - never the dominant colour.
+     Same AA-safe-base / decorative-light split as the primary accent. */
+  --color-accent-warm: #c2410c;
+  --color-accent-warm-hover: #9a3412;
+  --color-accent-warm-light: #ea580c;
+  --color-accent-warm-foreground: #ffffff;
+
+  /* Decorative only (header accent bars, hero glows, underlines) - these
+     include the brighter *-light stops, which fall short of 4.5:1 on their
+     own and must never sit under small text. */
+  --gradient-brand: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-accent) 55%, var(--color-accent-warm) 100%);
+  --gradient-sky: linear-gradient(135deg, var(--color-accent-light) 0%, var(--color-accent) 100%);
+  --gradient-warm: linear-gradient(135deg, var(--color-accent-warm-light) 0%, var(--color-accent-warm) 100%);
+
+  /* Button-safe: both stops (and the interpolated midpoint - checked
+     directly, gradients don't interpolate contrast linearly) clear 4.5:1
+     against white, so white button text stays AA-compliant across the
+     whole fill, unlike the brighter decorative gradients above. */
+  --gradient-sky-button: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
+  --gradient-warm-button: linear-gradient(135deg, var(--color-accent-warm) 0%, var(--color-accent-warm-hover) 100%);
+
+  /* Text-safe: sky-700 -> ember-700 only (no bright *-light stops). Sampled
+     at 0/25/50/75/100% against --color-background - every point clears
+     4.5:1, so this is safe for normal body-size text, not just large
+     headings, unlike --gradient-brand. */
+  --gradient-brand-text: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-warm) 100%);
 
   --radius: 0.5rem;
 
@@ -32,7 +74,12 @@
   --color-border: var(--color-border);
   --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
+  --color-accent-light: var(--color-accent-light);
   --color-accent-foreground: var(--color-accent-foreground);
+  --color-accent-warm: var(--color-accent-warm);
+  --color-accent-warm-hover: var(--color-accent-warm-hover);
+  --color-accent-warm-light: var(--color-accent-warm-light);
+  --color-accent-warm-foreground: var(--color-accent-warm-foreground);
   --radius-token: var(--radius);
   --font-sans: var(--font-ui-sans);
   --font-serif: var(--font-story-serif);
@@ -49,10 +96,35 @@
   }
 }
 
+/* "Cloudy" atmosphere: soft, low-opacity colour washes behind the content,
+   not a loud full-bleed gradient - a sky-blue glow top-left, a hint of the
+   warm accent top-right, a soft blue horizon at the bottom. Fixed
+   attachment so it reads as atmosphere rather than scrolling with the page;
+   degrades gracefully (scrolls with content instead) wherever fixed
+   attachment isn't supported. */
 body {
-  background: var(--color-background);
+  background-color: var(--color-background);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 15% -10%, color-mix(in srgb, var(--color-accent-light) 14%, transparent), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 85% 0%, color-mix(in srgb, var(--color-accent-warm-light) 8%, transparent), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, color-mix(in srgb, var(--color-accent-light) 10%, transparent), transparent 60%);
+  background-attachment: fixed;
   color: var(--color-foreground);
   font-family: var(--font-ui-sans), system-ui, sans-serif;
+}
+
+/* A gradient wordmark/heading treatment, used sparingly (the site header
+   brand link, the home page h1). Uses --gradient-brand-text specifically
+   (not the brighter --gradient-brand) - every point sampled along it clears
+   4.5:1 against the page background, verified directly rather than assumed,
+   since gradient text can't be contrast-checked as a single colour. Falls
+   back to solid foreground if background-clip: text isn't supported. */
+.gradient-text {
+  color: var(--color-accent);
+  background: var(--gradient-brand-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Visible on keyboard focus only, never on mouse click. */
@@ -128,13 +200,13 @@ body {
 }
 
 .story-body blockquote {
-  border-left: 3px solid var(--color-border);
+  border-left: 3px solid var(--color-accent-light);
   padding-left: 1rem;
   color: var(--color-muted);
 }
 
 .story-body code {
-  background: var(--color-surface);
+  background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 0.125rem 0.375rem;
@@ -142,7 +214,7 @@ body {
 }
 
 .story-body pre {
-  background: var(--color-surface);
+  background: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 1rem;
